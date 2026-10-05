@@ -72,7 +72,17 @@ details.levels dd{margin:0 0 4px}
 .grid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
 aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px}
-@media (max-width:860px){aside.panel{position:static}}
+aside.panel{max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--band) transparent}
+@media (max-width:860px){aside.panel{position:static;max-height:none;overflow:visible}}
+.findbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-bottom:12px}
+@media (max-width:520px){.findbar{grid-template-columns:minmax(0,1fr)}}
+.search{position:relative}
+.search input{padding-left:36px;height:42px;font-size:15px;background:var(--surface);border-radius:999px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2}
+.findbar select{height:42px;border-radius:999px;background:var(--surface);font-weight:600;padding-inline:14px}
+.rank{font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;font:inherit;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:11px 16px;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 18px rgba(15,31,61,.22);cursor:pointer;display:none}
+@media (max-width:860px){.fab.show{display:block}}
 .panel h2{font-family:var(--f-display);font-size:17px;margin:0}
 fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
 legend{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
@@ -221,9 +231,22 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
         <p class="err" id="err" role="alert"></p>
         <button class="btn" type="button" id="reset">Clear my info</button>
       </aside>
+      <button type="button" class="fab" id="fab">Edit my profile</button>
 
       <div style="min-width:0">
         <div class="summary" id="summary" aria-live="polite"></div>
+        <div class="findbar">
+          <label class="search" for="q"><span hidden>Search colleges</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+            <input id="q" type="search" placeholder="Search by college name or city" maxlength="80" autocomplete="off" aria-label="Search colleges by name or city">
+          </label>
+          <select id="group" aria-label="College group">
+            <option value="all">All colleges</option>
+            <option value="ivy">Ivy League</option>
+            <option value="top20">Top 20 most selective</option>
+            <option value="top50">Top 50 most selective</option>
+          </select>
+        </div>
         <div class="toolbar">
           <div class="chips" role="group" aria-label="Show">
             <button type="button" class="chip" data-cat="all" aria-pressed="true">All</button>
@@ -267,6 +290,8 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     <h3>4b. Extracurricular impact</h3>
     <p>Many colleges read applications holistically, so activities can move the needle, and they matter more the more selective a school is. You can rate each activity on four levels: Level 1 (national), Level 2 (state or regional), Level 3 (school leader) and Level 4 (involved). Your strongest activities count most; each extra activity adds a bit less.</p>
     <p>MedianMatch compares your activity strength with what is typical for each school’s selectivity. Activities count for about 10% of the fit score at schools that admit most applicants and up to about 35% at the most selective schools. When your activities change a school’s label, the card tells you. Colleges don’t publish activity data, so this part is a rule of thumb based on how holistic admissions generally work, not a measured statistic.</p>
+    <h3>4c. Ivy League and Top 20 filters</h3>
+    <p>“Ivy League” shows the eight Ivy League universities. “Top 20 most selective” and “Top 50 most selective” rank colleges by their published admission rate in the federal data (lowest rate = #1). This is a selectivity ranking, not a quality ranking like U.S. News, and it only includes colleges in MedianMatch.</p>
     <h3>5. Cost and aid</h3>
     <p>College Scorecard reports the average net price (cost of attendance minus grants and scholarships) for five family income groups: $0–30k, $30–48k, $48–75k, $75–110k and $110k+. MedianMatch places you in your group and shows that number. For public colleges this is the in-state figure; if the college is outside your home state, MedianMatch adds the published out-of-state tuition difference and marks the result as an estimate. A negative or zero net price means grants typically cover the full cost for that group.</p>
     <h3>6. Security and privacy design</h3>
@@ -359,6 +384,9 @@ const D = Object.freeze(RAW.map(r => Object.freeze({
   tIn:r[17]==null?null:r[17]*100, tOut:r[18]==null?null:r[18]*100,
   grad:r[19], earn:r[20]==null?null:r[20]*1000, pell:r[21], url:r[22]
 })));
+const IVY = new Set(["Brown University","Columbia University in the City of New York","Cornell University","Dartmouth College","Harvard University","Princeton University","University of Pennsylvania","Yale University"]);
+// Selectivity rank: 1 = lowest admission rate in the dataset
+const SEL_RANK = new Map([...D].filter(d=>d.admit!=null).sort((a,b)=>a.admit-b.admit||a.name.localeCompare(b.name)).map((d,i)=>[d,i+1]));
 
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=String(text); return e; };
@@ -425,9 +453,11 @@ document.querySelectorAll("[data-test]").forEach(b=>b.addEventListener("click",(
 document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()=>{
   cat=b.dataset.cat; document.querySelectorAll("[data-cat]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); shown=25; run();
 }));
+["q","group"].forEach(id=>$(id).addEventListener("input",()=>{ shown=25; run(); }));
 ["sat","act","gpa","income","home","ctl","sz","where","maxp","sort"].forEach(id=>$(id).addEventListener("input",()=>{ shown=25; $("exampleNote").hidden=true; run(); }));
 $("moreBtn").addEventListener("click",()=>{ shown+=25; run(); });
 $("reset").addEventListener("click",()=>{
+  $("q").value=""; $("group").value="all";
   ["sat","act","gpa","income","maxp"].forEach(id=>$(id).value=""); homeSel.value=""; acts=[]; renderActs(); whereSel.value="any"; $("ctl").value="all"; $("sz").value="all";
   $("exampleNote").hidden=true; shown=25; run();
 });
@@ -476,6 +506,12 @@ function evaluate(d,p){
 }
 
 function passFilters(d,p){
+  const g=$("group").value, rk=SEL_RANK.get(d);
+  if(g==="ivy" && !IVY.has(d.name)) return false;
+  if(g==="top20" && !(rk<=20)) return false;
+  if(g==="top50" && !(rk<=50)) return false;
+  const q=$("q").value.trim().toLowerCase().slice(0,80);
+  if(q){ const hay=(d.name+" "+d.city+" "+d.st+" "+(STATES[d.st]||"")).toLowerCase(); if(!q.split(/\s+/).every(w=>hay.includes(w))) return false; }
   const c=$("ctl").value; if(c!=="all" && String(d.pub?1:2)!==c) return false;
   const z=$("sz").value, n=d.size||0;
   if(z==="s"&&n>=5000) return false; if(z==="m"&&(n<5000||n>15000)) return false; if(z==="l"&&n<=15000) return false;
@@ -507,7 +543,10 @@ function fact(label,val,hl){ const f=el("div","fact"); f.append(el("span",null,l
 function card(r,p){
   const li=el("li","card");
   const head=el("div"); head.style.minWidth="0";
-  head.append(el("h3",null,r.d.name));
+  const h=el("h3",null,r.d.name);
+  if(IVY.has(r.d.name)) h.append(el("span","rank","Ivy League"));
+  const rk=SEL_RANK.get(r.d); if(rk<=50) h.append(el("span","rank","#"+rk+" most selective"));
+  head.append(h);
   head.append(el("div","where",`${r.d.city}, ${r.d.st} · ${r.d.pub?"Public":"Private"} · ${r.d.size?r.d.size.toLocaleString("en-US")+" undergrads":"size n/a"}`));
   li.append(head);
   if(r.label) li.append(el("span","tag "+r.label,r.label)); else li.append(el("span"));
@@ -517,8 +556,8 @@ function card(r,p){
   facts.append(fact("ACT middle 50%", r.d.actLo&&r.d.actHi?`${r.d.actLo}–${r.d.actHi}`:"n/a"));
   facts.append(fact("Typical GPA (est.)", r.gpaEst.toFixed(2)));
   if(r.ecRel) facts.append(fact("Your activities", r.ecRel));
-  facts.append(fact(p.inc!=null?`Net price, ${BRACKET_LABEL[bracket(p.inc)]}${r.estOut?" (est.)":""}`:"Avg net price", money(r.price)+"/yr", true));
-  facts.append(fact("Sticker price", money(r.d.coa)+"/yr"));
+  facts.append(fact(p.inc!=null?`Net price, ${BRACKET_LABEL[bracket(p.inc)]}${r.estOut?" (est.)":""}`:"Avg net price", (r.price==null?"n/a":money(r.price)+"/yr"), true));
+  facts.append(fact("Sticker price", (r.d.coa==null?"n/a":money(r.d.coa)+"/yr")));
   facts.append(fact("Pell recipients", pct(r.d.pell)));
   facts.append(fact("Graduation rate", pct(r.d.grad)));
   facts.append(fact("Median pay, 10 yrs", money(r.d.earn)));
@@ -570,13 +609,17 @@ function run(){
     sel:r=>r.d.admit??2
   }[sort];
   rows.sort((a,b)=>key(a)-key(b) || a.d.name.localeCompare(b.d.name));
-  if(!rows.length){ list.append(el("li","empty","No colleges fit these filters. Try widening location, size or the max net price.")); $("moreBtn").hidden=true; return; }
+  if(!rows.length){ list.append(el("li","empty",$("q").value.trim()?"No colleges match that search with your current filters. Check the spelling or set the group and location to All.":"No colleges fit these filters. Try widening location, size or the max net price.")); $("moreBtn").hidden=true; return; }
   rows.slice(0,shown).forEach(r=>list.append(card(r,p)));
   $("moreBtn").hidden = rows.length<=shown;
   $("moreBtn").textContent = `Show ${Math.min(25,rows.length-shown)} more (${rows.length} total)`;
 }
 $("agree").addEventListener("change",run);
 
+// Mobile: floating button jumps back to the profile once it scrolls out of view
+const panel=document.querySelector("aside.panel"), fab=$("fab");
+fab.addEventListener("click",()=>{ panel.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"}); setTimeout(()=>$("sat").focus({preventScroll:true}),400); });
+if("IntersectionObserver" in window){ new IntersectionObserver(es=>es.forEach(e=>fab.classList.toggle("show",!e.isIntersecting && !document.getElementById("view-match").hidden))).observe(panel); }
 // Simple view router using bare hash anchors
 const VIEWS=["match","how","terms","privacy"];
 function route(){
