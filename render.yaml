@@ -1,9 +1,10 @@
+# Render Blueprint for MedianMatch: a free static website + a free API for anonymous usage stats.
 services:
   - type: web
     name: medianmatch
     runtime: static
     buildCommand: echo "No build needed"
-    staticPublishPath: ./
+    staticPublishPath: ./public
     headers:
       - path: /*
         name: X-Frame-Options
@@ -13,10 +14,26 @@ services:
         value: nosniff
       - path: /*
         name: Referrer-Policy
-        value: no-referrer
+        value: strict-origin-when-cross-origin
       - path: /*
         name: Permissions-Policy
         value: camera=(), microphone=(), geolocation=(), payment=()
       - path: /*
         name: Strict-Transport-Security
         value: max-age=31536000; includeSubDomains
+
+  - type: web
+    name: medianmatch-api
+    runtime: node
+    plan: free
+    rootDir: api
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false   # paste your Neon connection string in Render, never in code
+      - key: ADMIN_PASSWORD
+        sync: false   # choose a password of 12+ characters
+      - key: ALLOWED_ORIGINS
+        value: https://medianmatch.onrender.com

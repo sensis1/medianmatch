@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>MedianMatch Stats</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column; login card, then tiles, the daily-visits chart, and ranked lists in a two-column grid. */
+:root{--bg:#f5f9ff;--surface:#fff;--ink:#0f1f3d;--muted:#55657f;--line:#dbe5f3;--accent:#1a6dff;--accent-ink:#fff;--accent-soft:#e6f0ff;--bar:#1a6dff;--bar-soft:#bcd5ff;--err:#c2410c;
+  --f:"Plus Jakarta Sans",system-ui,sans-serif;--m:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1428;--surface:#111d36;--ink:#e8f0ff;--muted:#9db0cf;--line:#22335a;--accent:#5c9dff;--accent-ink:#0b1428;--accent-soft:#18305c;--bar:#5c9dff;--bar-soft:#2a4f8f;--err:#ffa45c;color-scheme:dark}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0}
+h1 span{color:var(--accent)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.login{max-width:380px;margin:12vh auto 0;display:grid;gap:12px}
+label{font-weight:600;font-size:14px;display:grid;gap:6px}
+input,select,button{font:inherit}
+input,select{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:9px 10px}
+button{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:8px;padding:10px 14px;cursor:pointer}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.err{color:var(--err);font-weight:600;font-size:13.5px;min-height:1.2em;margin:0}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile b{display:block;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.tile span{font-size:12.5px;color:var(--muted)}
+h2{font-size:15px;margin:0 0 10px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:220px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12.5px;padding:4px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-110%)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+ol.rank{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+ol.rank li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;font-size:13.5px}
+ol.rank .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol.rank .n{font-family:var(--m);font-variant-numeric:tabular-nums}
+ol.rank .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+ol.rank .bar i{display:block;height:100%;background:var(--bar);border-radius:3px}
+.empty{color:var(--muted);font-size:13.5px}
+.note{color:var(--muted);font-size:12.5px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <form class="card login" id="login" autocomplete="off">
+    <h1>Median<span>Match</span> stats</h1>
+    <label for="pw">Admin password<input id="pw" type="password" required minlength="12" autocomplete="current-password"></label>
+    <button type="submit">Open dashboard</button>
+    <p class="err" id="err" role="alert"></p>
+  </form>
+
+  <div id="dash" hidden>
+    <div class="top">
+      <h1>Median<span>Match</span> stats</h1>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="range" aria-label="Time range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select>
+        <button type="button" id="refresh">Refresh</button>
+        <button type="button" class="ghost" id="lock">Lock</button>
+      </div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <h2>Visits per day</h2>
+      <div class="chart" id="chart"></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h2>Most-opened colleges</h2><ol class="rank" id="colleges"></ol></div>
+      <div class="card"><h2>Links clicked</h2><ol class="rank" id="links"></ol></div>
+      <div class="card"><h2>Top searches</h2><ol class="rank" id="searches"></ol></div>
+      <div class="card"><h2>Filters, sorts &amp; tabs</h2><ol class="rank" id="groups"></ol></div>
+      <div class="card"><h2>Devices</h2><ol class="rank" id="devices"></ol></div>
+      <div class="card"><h2>Where visitors came from</h2><ol class="rank" id="referrers"></ol></div>
+    </div>
+    <p class="note">Visitors are counted with an anonymous ID that resets every day, so “visitors” means unique visitors per day, added up. No scores, GPA, income or activities are ever collected. Events older than 13 months are deleted automatically.</p>
+  </div>
+</div>
+<script nonce="__NONCE__">
+(function(){
+"use strict";
+let pw = ""; // kept in memory only; closing the tab forgets it
+const $ = id => document.getElementById(id);
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = String(txt); return e; };
+const fmt = n => Number(n || 0).toLocaleString("en-US");
+
+async function load(){
+  const r = await fetch("/admin/stats", { method:"POST", headers:{ "Authorization":"Bearer " + pw, "Content-Type":"application/json" }, body: JSON.stringify({ days: Number($("range").value) }) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || "Couldn’t load stats.");
+  return data;
+}
+function tiles(t){
+  const box = $("tiles"); box.replaceChildren();
+  [["Visits", t.visits], ["Visitors", t.visitors], ["Colleges opened", t.college_opens], ["Links clicked", t.link_clicks], ["Searches", t.searches]].forEach(([k, v]) => {
+    const d = el("div", "card tile"); d.append(el("b", null, fmt(v)), el("span", null, k)); box.append(d);
+  });
+}
+function chart(rows){
+  const box = $("chart"); box.replaceChildren();
+  const W = 1000, H = 220, L = 34, B = 24, T = 8, max = Math.max(1, ...rows.map(r => r.visits));
+  const step = Math.pow(10, Math.floor(Math.log10(max))); const top = Math.ceil(max / step) * step;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Visits per day bar chart");
+  const mk = (n, a) => { const e = document.createElementNS(ns, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  [0, top / 2, top].forEach(v => {
+    const y = T + (H - B - T) * (1 - v / top);
+    svg.append(mk("line", { x1: L, x2: W, y1: y, y2: y, stroke: "var(--line)", "stroke-width": 1, "vector-effect": "non-scaling-stroke" }));
+    const tx = mk("text", { x: L - 6, y: y + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }); tx.textContent = fmt(v); svg.append(tx);
+  });
+  const bw = (W - L) / rows.length, gap = Math.min(2, bw * 0.2);
+  const tip = el("div", "tip"); tip.hidden = true;
+  rows.forEach((r, i) => {
+    const h = (H - B - T) * (r.visits / top), x = L + i * bw + gap / 2, y = H - B - h;
+    const bar = mk("rect", { x, y: h ? y : H - B - 1, width: Math.max(1, bw - gap), height: Math.max(h, 1), rx: Math.min(4, (bw - gap) / 2), fill: r.visits ? "var(--bar)" : "var(--line)" });
+    const hit = mk("rect", { x: L + i * bw, y: T, width: bw, height: H - B - T, fill: "transparent" });
+    hit.addEventListener("pointerenter", () => { tip.hidden = false; tip.textContent = `${r.day}: ${fmt(r.visits)} visits, ${fmt(r.visitors)} visitors`; tip.style.left = ((L + i * bw + bw / 2) / W * 100) + "%"; tip.style.top = (y / H * 220) + "px"; });
+    hit.addEventListener("pointerleave", () => { tip.hidden = true; });
+    svg.append(bar, hit);
+    if (rows.length <= 31 ? i % Math.ceil(rows.length / 8) === 0 : i % Math.ceil(rows.length / 6) === 0) {
+      const tx = mk("text", { x: L + i * bw + bw / 2, y: H - 6, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }); tx.textContent = r.day.slice(5); svg.append(tx);
+    }
+  });
+  box.append(svg, tip);
+}
+function ranked(id, rows){
+  const ol = $(id); ol.replaceChildren();
+  if (!rows.length) { ol.append(el("li", "empty", "Nothing yet.")); return; }
+  const max = Math.max(...rows.map(r => r.n));
+  rows.forEach(r => {
+    const li = el("li"); li.append(el("span", "name", r.label), el("span", "n", fmt(r.n)));
+    const bar = el("span", "bar"); const i = el("i"); i.style.width = (r.n / max * 100) + "%"; bar.append(i); li.append(bar); ol.append(li);
+  });
+}
+async function show(){
+  const d = await load();
+  tiles(d.totals); chart(d.byDay);
+  ranked("colleges", d.colleges); ranked("links", d.links); ranked("searches", d.searches);
+  ranked("groups", d.groups); ranked("devices", d.devices); ranked("referrers", d.referrers);
+}
+$("login").addEventListener("submit", async e => {
+  e.preventDefault(); $("err").textContent = ""; pw = $("pw").value;
+  try { await show(); $("login").hidden = true; $("dash").hidden = false; $("pw").value = ""; }
+  catch (err) { pw = ""; $("err").textContent = err.message; }
+});
+$("range").addEventListener("change", () => show().catch(err => { $("err").textContent = err.message; }));
+$("refresh").addEventListener("click", () => show().catch(err => { $("err").textContent = err.message; }));
+$("lock").addEventListener("click", () => { pw = ""; $("dash").hidden = true; $("login").hidden = false; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "medianmatch-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anonymous usage tracking and admin dashboard for MedianMatch",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
