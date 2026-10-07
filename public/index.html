@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://medianmatch-api.onrender.com; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://medianmatch-stats.onrender.com; form-action 'none'; base-uri 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#1a6dff">
 <meta name="description" content="See your estimated chance at about 900 U.S. colleges and what each would cost your family. Free, private, no account.">
 <title>Median Match</title>
 
@@ -123,7 +124,110 @@ aside.panel{max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area
 .fine{font-size:12px;color:var(--muted);margin:0}
 body.locked{overflow:hidden}
 .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;font:inherit;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:11px 16px;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 18px rgba(15,31,61,.22);cursor:pointer;display:none}
-@media (max-width:860px){.fab.show{display:block}}
+
+/* ---- Heart / save ---- */
+.heart{all:unset;cursor:pointer;width:34px;height:34px;border-radius:999px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--muted);flex:none}
+.heart svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.heart[aria-pressed="true"]{color:#e0245e;border-color:#f6b8cb;background:#fff0f5}
+.heart[aria-pressed="true"] svg{fill:currentColor}
+.heart:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tagrow{display:flex;gap:8px;align-items:center}
+nav.tabs .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:11.5px;font-weight:800}
+nav.tabs .count:empty{display:none}
+/* ---- My List ---- */
+.listwrap{display:grid;gap:16px;margin-top:20px;max-width:900px}
+.listhead h2{font-family:var(--f-display);font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0}
+.balance{display:grid;gap:10px}
+.balbar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line);gap:2px}
+.balbar i{display:block;height:100%}
+.balbar i.Reach{background:var(--reach)} .balbar i.Match{background:var(--match)} .balbar i.Safety{background:var(--safety)} .balbar i.None{background:var(--band)}
+.balkey{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.balkey b{color:var(--ink);font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.dot.Reach{background:var(--reach)} .dot.Match{background:var(--match)} .dot.Safety{background:var(--safety)}
+.advice{font-size:14px;padding:10px 12px;border-radius:10px;background:var(--sky);color:var(--ink)}
+.lgroup h3{font-family:var(--f-display);font-size:16px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.lrows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.lrow .nm{min-width:0}
+.lrow .nm button{all:unset;cursor:pointer;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .nm button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.lrow .nm small{color:var(--muted);font-size:12.5px}
+.lrow .c{font-family:var(--f-display);font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lrow .p{font-family:var(--f-mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.lrow input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.rm{all:unset;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;width:28px;height:28px;display:grid;place-items:center;border-radius:999px}
+.rm:hover{background:var(--accent-soft);color:var(--ink)}
+@media (max-width:560px){.lrow{grid-template-columns:auto minmax(0,1fr) auto auto}.lrow .p{grid-column:2/3;grid-row:2}}
+.cmpbar{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 14px;z-index:4}
+.cmpbar button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.cmpbar button:disabled{opacity:.45;cursor:default}
+.cmpwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+table.cmp{border-collapse:separate;border-spacing:0;width:100%;min-width:520px;font-size:14px}
+table.cmp th,table.cmp td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.cmp thead th{font-family:var(--f-display);font-size:15px;line-height:1.25}
+table.cmp tbody th{font-weight:600;color:var(--muted);font-size:13px;white-space:nowrap;position:sticky;left:0;background:var(--surface)}
+table.cmp td{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+table.cmp td.best{color:var(--safety);font-weight:700}
+table.cmp tr:last-child th,table.cmp tr:last-child td{border-bottom:0}
+/* ---- Quick start ---- */
+.qs{position:fixed;inset:0;z-index:30;background:linear-gradient(160deg,var(--sky),var(--sky2));display:grid;place-items:center;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 16px);overflow-y:auto}
+.qscard{width:min(520px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 24px;box-shadow:0 20px 60px rgba(15,31,61,.14);display:grid;gap:18px}
+.qsprog{display:flex;gap:6px}
+.qsprog i{flex:1;height:6px;border-radius:999px;background:var(--line)}
+.qsprog i.on{background:var(--accent)}
+.qscard h2{font-family:var(--f-display);font-size:clamp(24px,5vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin:0;text-wrap:balance}
+.qscard p.sub{margin:-8px 0 0;color:var(--muted)}
+.qsopts{display:grid;gap:8px}
+.qsopts.cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+.qopt{font:inherit;font-weight:700;text-align:left;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px 14px;cursor:pointer}
+.qopt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.qopt small{display:block;font-weight:500;color:var(--muted);font-size:12.5px}
+.qbig{font-family:var(--f-display);font-size:28px;font-weight:800;text-align:center;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.qsnav{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.qnext{font:inherit;font-weight:800;font-size:16px;border:0;border-radius:999px;padding:12px 22px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.qnext:disabled{opacity:.45;cursor:default}
+.qback,.qskip{font:inherit;font-weight:600;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
+.qsagree{display:flex!important;flex-direction:row!important;gap:10px!important;align-items:flex-start;font-weight:400!important;font-size:13.5px!important}
+.qsagree input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.qerr{color:var(--reach);font-size:13px;font-weight:600;margin:0;min-height:1em}
+/* ---- Phone: results first, profile in a slide-up sheet ---- */
+.sheethead{display:none}
+.mbar{display:none}
+@media (max-width:860px){
+  .hero{padding:16px 16px;margin-block:12px;gap:8px}
+  .hero p{display:none}
+  .hero h1{font-size:24px}
+  header.top{padding-block:14px 10px;gap:6px}
+  nav.tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;max-width:100%}
+  nav.tabs a{padding:6px 8px;font-size:13.5px;white-space:nowrap}
+  .agree{padding:10px 12px}
+  .agree.done{display:none}
+  .hero .pills span+span{display:none}
+  .agree label{font-size:13px}
+  .summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .stat{padding:8px 8px}
+  .stat b{font-size:18px}
+  .stat span{font-size:11px;line-height:1.25;display:block}
+  aside.panel{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:16;max-height:88vh;max-height:88dvh;overflow-y:auto;border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .25s ease;box-shadow:0 -12px 40px rgba(15,31,61,.18);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
+  aside.panel.open{transform:none}
+  .sheethead{display:flex;justify-content:space-between;align-items:center;position:sticky;top:-18px;margin:-18px -18px 0;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--line);z-index:1}
+  .sheethead::before{content:"";position:absolute;left:50%;top:5px;width:38px;height:4px;border-radius:2px;background:var(--line);transform:translateX(-50%)}
+  .sheethead b{font-family:var(--f-display);font-size:17px}
+  .sheethead button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:7px 16px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+  .panel > h2{display:none}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:12;gap:10px;align-items:center;justify-content:space-between;padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px);background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(15,31,61,.08)}
+  .mbar .sum{min-width:0;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mbar .sum b{color:var(--ink)}
+  .mbar button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 16px;background:var(--accent);color:var(--accent-ink);cursor:pointer;white-space:nowrap}
+  .wrap{padding-bottom:96px}
+  .toolbar .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .facts .fact:not(.key){display:none}
+  .card .links a{display:none}
+  .cmpbar{bottom:calc(env(safe-area-inset-bottom,0px) + 78px)}
+}
+.sheetscrim{position:fixed;inset:0;background:rgba(15,31,61,.38);z-index:15}
+@media (min-width:861px){.sheetscrim{display:none!important}}
 .panel h2{font-family:var(--f-display);font-size:17px;margin:0}
 fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
 legend{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
@@ -140,7 +244,7 @@ input[type=checkbox]{width:auto}
 .btn{font:inherit;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:6px;cursor:pointer}
 .btn:hover{border-color:var(--accent)}
 .summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
-@media (max-width:640px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.summary .stat{padding:8px}.summary .stat b{font-size:18px}.summary .stat span{font-size:11px;line-height:1.25;display:block}}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
 .stat b{display:block;font-family:var(--f-display);font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .stat span{font-size:12.5px;color:var(--muted)}
@@ -200,6 +304,7 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     <p class="brand">Median<span>Match</span></p>
     <nav class="tabs" aria-label="Sections">
       <a href="#match" data-view="match">Match</a>
+      <a href="#list" data-view="list">My List<span class="count" id="listCount"></span></a>
       <a href="#how" data-view="how">How it works</a>
       <a href="#terms" data-view="terms">Terms</a>
       <a href="#privacy" data-view="privacy">Privacy</a>
@@ -219,7 +324,8 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     </div>
 
     <div class="grid">
-      <aside class="panel" aria-label="Your profile">
+      <aside class="panel" id="panel" aria-label="Your profile">
+        <div class="sheethead"><b>Your profile &amp; filters</b><button type="button" id="sheetDone">Show results</button></div>
         <h2>Your profile</h2>
         <p class="note" id="exampleNote">Filled in with an example student. Replace with your own numbers.</p>
         <fieldset>
@@ -270,9 +376,11 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
           <label for="maxp">Max yearly net price <small>Leave blank for no limit</small><input id="maxp" type="number" inputmode="numeric" min="0" step="1000" placeholder="e.g. 20000"></label>
         </fieldset>
         <p class="err" id="err" role="alert"></p>
-        <button class="btn" type="button" id="reset">Clear my info</button>
+        <div class="row2">
+          <button class="btn" type="button" id="qsOpen">Quick setup</button>
+          <button class="btn" type="button" id="reset">Clear my info</button>
+        </div>
       </aside>
-      <button type="button" class="fab" id="fab">Edit my profile</button>
       <div class="scrim" id="scrim" hidden></div>
       <section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden></section>
 
@@ -312,6 +420,11 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     </div>
   </section>
 
+  <!-- MY LIST VIEW -->
+  <section id="view-list" data-panel="list" hidden>
+    <div class="listwrap" id="listView"></div>
+  </section>
+
   <!-- HOW VIEW -->
   <section class="legal" id="view-how" data-panel="how" hidden>
     <h2>How MedianMatch works</h2>
@@ -340,7 +453,7 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     <h3>5. Cost and aid</h3>
     <p>College Scorecard reports the average net price (cost of attendance minus grants and scholarships) for five family income groups: $0–30k, $30–48k, $48–75k, $75–110k and $110k+. MedianMatch places you in your group and shows that number. For public colleges this is the in-state figure; if the college is outside your home state, MedianMatch adds the published out-of-state tuition difference and marks the result as an estimate. A negative or zero net price means grants typically cover the full cost for that group.</p>
     <h3>6. Security and privacy design</h3>
-    <p>All matching and chance calculations run in your browser. Your scores, GPA, income and activities are never sent to our server. A small server records anonymous usage counts (visits, which colleges are opened, which links are clicked and what is searched) so we can improve the site; the Privacy Policy lists exactly what. There are no accounts, cookies or ads. College names and figures are displayed as plain text, so data can’t inject code into the page.</p>
+    <p>All matching and chance calculations run in your browser. Your scores, GPA, income and activities are never sent to our server. My List is kept in your own browser. A small server records anonymous usage counts (visits, which colleges are opened, which links are clicked and what is searched) so we can improve the site; the Privacy Policy lists exactly what. There are no accounts, cookies or ads. College names and figures are displayed as plain text, so data can’t inject code into the page.</p>
   </section>
 
   <!-- TERMS VIEW -->
@@ -385,12 +498,13 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     <p>Short version: what you type about yourself (scores, GPA, income, activities) never leaves your browser. We count anonymous visits and clicks to improve the site. We don’t use cookies, don’t sell data and don’t show ads.</p>
     <h3>What stays in your browser</h3>
     <p>Test scores, GPA, activities, household income, home state and price limits are processed only inside your web browser to compute matches and chance estimates. They are never sent to us or to anyone else, never written to a database, and not saved in cookies or browser storage. Closing or reloading the page erases them, and “Clear my info” erases them immediately.</p>
+    <p>Two small things are remembered in your browser’s local storage on your device only: the names of colleges you save to My List, and a note that you finished or skipped Quick setup (so it doesn’t appear every visit). Clearing your browser’s site data removes both.</p>
     <h3>What we collect</h3>
     <div class="tblwrap"><table>
       <tr><th>Category</th><th>Collected?</th></tr>
       <tr><td>Name, email, account or login</td><td>No (there are no accounts)</td></tr>
       <tr><td>Scores, GPA, activities, income, state</td><td>No (stays in your browser)</td></tr>
-      <tr><td>Anonymous usage events</td><td>Yes: page visits, which colleges you open, which outside links you click, which filters, sorts and tabs you use, and words typed into the college search bar</td></tr>
+      <tr><td>Anonymous usage events</td><td>Yes: page visits, which colleges you open or save, which colleges you compare, which outside links you click, which filters, sorts and tabs you use, whether you use Quick setup, and words typed into the college search bar</td></tr>
       <tr><td>Device and referral</td><td>Yes: device type (phone, tablet or computer) and the website that linked you here, if any</td></tr>
       <tr><td>IP address</td><td>Not stored (see below)</td></tr>
       <tr><td>Cookies, tracking pixels, advertising</td><td>No</td></tr>
@@ -414,6 +528,9 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
     <p>If we change what we collect, we will update this policy and its effective date before the change goes live.</p>
   </section>
 
+  <div class="mbar" id="mbar"><span class="sum" id="mbarSum"></span><button type="button" id="mbarBtn">Edit profile &amp; filters</button></div>
+  <div class="sheetscrim" id="sheetScrim" hidden></div>
+  <div class="qs" id="qs" role="dialog" aria-modal="true" aria-labelledby="qsTitle" hidden></div>
   <footer class="foot">
     <span>© 2026 MedianMatch</span>
     <span>Data: U.S. Department of Education, College Scorecard</span>
@@ -429,7 +546,7 @@ footer.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);fo
 // ---------- Anonymous usage tracking ----------
 // Sends only: page visits, colleges opened, links clicked, filters/sorts/tabs used and search words.
 // Never sends scores, GPA, income, activities or anything typed into the profile.
-const API_URL = "https://medianmatch-api.onrender.com";
+const API_URL = "https://medianmatch-stats.onrender.com";
 const track = (() => {
   let enabled = false;
   try {
@@ -646,7 +763,7 @@ function bandEl(r,p){
   return wrap;
 }
 
-function fact(label,val,hl){ const f=el("div","fact"); f.append(el("span",null,label)); const b=el("b",hl?"hl":null,val); f.append(b); return f; }
+function fact(label,val,hl,key){ const f=el("div","fact"+(key?" key":"")); f.append(el("span",null,label)); const b=el("b",hl?"hl":null,val); f.append(b); return f; }
 
 function card(r,p){
   const li=el("li","card");
@@ -657,21 +774,22 @@ function card(r,p){
   head.append(h);
   head.append(el("div","where",`${r.d.city}, ${r.d.st} · ${r.d.pub?"Public":"Private"} · ${r.d.size?r.d.size.toLocaleString("en-US")+" undergrads":"size n/a"}`));
   li.append(head);
-  const tc=el("div","tagcol");
-  if(r.label) tc.append(el("span","tag "+r.label,r.label));
+  const tc=el("div","tagcol"); const tr=el("div","tagrow");
+  if(r.label) tr.append(el("span","tag "+r.label,r.label));
+  tr.append(heartBtn(r.d.name)); tc.append(tr);
   if(r.chance){ const c=el("div","chance",rangeTxt(r.chance)); c.append(el("small",null,"est. chance")); tc.append(c); }
   li.append(tc);
   li.append(bandEl(r,p));
   const facts=el("div","facts");
-  facts.append(fact("Admit rate", r.d.admit==null?"n/a":(r.d.admit*100<1?"<1%":Math.round(r.d.admit*100)+"%")));
+  facts.append(fact("Admit rate", r.d.admit==null?"n/a":(r.d.admit*100<1?"<1%":Math.round(r.d.admit*100)+"%"),false,true));
   facts.append(fact("ACT middle 50%", r.d.actLo&&r.d.actHi?`${r.d.actLo}–${r.d.actHi}`:"n/a"));
   facts.append(fact("Typical GPA (est.)", r.gpaEst.toFixed(2)));
   if(r.ecRel) facts.append(fact("Your activities", r.ecRel));
-  facts.append(fact(p.inc!=null?`Net price, ${BRACKET_LABEL[bracket(p.inc)]}${r.estOut?" (est.)":""}`:"Avg net price", (r.price==null?"n/a":money(r.price)+"/yr"), true));
+  facts.append(fact(p.inc!=null?`Net price, ${BRACKET_LABEL[bracket(p.inc)]}${r.estOut?" (est.)":""}`:"Avg net price", (r.price==null?"n/a":money(r.price)+"/yr"), true, true));
   facts.append(fact("Sticker price", (r.d.coa==null?"n/a":money(r.d.coa)+"/yr")));
   facts.append(fact("Pell recipients", pct(r.d.pell)));
-  facts.append(fact("Graduation rate", pct(r.d.grad)));
-  facts.append(fact("Median pay, 10 yrs", money(r.d.earn)));
+  facts.append(fact("Graduation rate", pct(r.d.grad),false,true));
+  facts.append(fact("Median pay, 10 yrs", money(r.d.earn),false,true));
   li.append(facts);
   const RANK={Reach:0,Match:1,Safety:2};
   if(r.label && r.label0 && r.label!==r.label0){
@@ -689,17 +807,20 @@ function card(r,p){
   const npc=el("a",null,"Find its Net Price Calculator"); npc.href="https://collegecost.ed.gov/net-price"; npc.target="_blank"; npc.rel="noopener noreferrer"; links.append(npc);
   li.append(links);
   links.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>track("link_click",a.textContent+" · "+r.d.name)));
-  li.addEventListener("click",e=>{ if(e.target.closest("a")) return; openDrawer(r.d, e.target.closest("button")||nb); });
+  li.addEventListener("click",e=>{ if(e.target.closest("a,.heart")) return; openDrawer(r.d, e.target.closest("button")||nb); });
   return li;
 }
 
 function stat(cls,big,small){ const s=el("div","stat "+(cls||"")); s.append(el("b",null,big)); s.append(el("span",null,small)); return s; }
 
 function run(){
-  const agreed=$("agree").checked;
+  const agreed=$("agree").checked; $("agreeBox").classList.toggle("done",agreed);
   const p=readProfile();
   $("ecLabel").textContent=ecWord(p.ec); $("ecBar").style.width=p.ec==null?"0":Math.round(p.ec*100)+"%";
   $("err").textContent=p.errs.join(" ");
+  { const s=$("mbarSum"); s.replaceChildren(); const parts=[];
+    if(p.sat!=null) parts.push(test==="act"?"ACT "+$("act").value:"SAT "+p.sat); if(p.gpa!=null) parts.push("GPA "+p.gpa.toFixed(2)); if(p.inc!=null) parts.push("$"+Math.round(p.inc/1000)+"k");
+    if(parts.length){ parts.forEach((x,i)=>{ if(i) s.append(document.createTextNode(" · ")); s.append(el("b",null,x)); }); } else s.textContent="Add your scores to see chances"; }
   const list=$("list"), sum=$("summary");
   list.replaceChildren(); sum.replaceChildren();
   if(!agreed){
@@ -755,7 +876,8 @@ function renderDrawer(){
   const rk=SEL_RANK.get(d); if(rk<=50) badges.append(el("span","rank","#"+rk+" most selective"));
   if(badges.childNodes.length) ttl.append(badges);
   const x=el("button","xbtn","×"); x.type="button"; x.setAttribute("aria-label","Close"); x.addEventListener("click",closeDrawer);
-  hd.append(ttl,x); drawer.append(hd);
+  const hx=el("div","tagrow"); hx.append(heartBtn(d.name),x);
+  hd.append(ttl,hx); drawer.append(hd);
 
   // Chance
   const cs=el("div","dsec");
@@ -793,7 +915,7 @@ function renderDrawer(){
   grid.append(miniInput("Income","dInc","income",{type:"number",inputMode:"numeric",min:0,step:1000}));
   es.append(grid);
   const ecb=el("button","btn add",`Edit activities (${acts.length})`); ecb.type="button";
-  ecb.addEventListener("click",()=>{ closeDrawer(); panel.scrollIntoView({block:"start"}); setTimeout(()=>$("ecAdd").focus(),50); });
+  ecb.addEventListener("click",()=>{ closeDrawer(); openProfile("ecAdd"); });
   es.append(ecb);
   if(p.errs.length) es.append(el("p","err",p.errs.join(" ")));
   drawer.append(es);
@@ -853,21 +975,214 @@ document.addEventListener("keydown",e=>{
     else if(!e.shiftKey && document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); } }
 });
 
-// Mobile: floating button jumps back to the profile once it scrolls out of view
-const panel=document.querySelector("aside.panel"), fab=$("fab");
-fab.addEventListener("click",()=>{ panel.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"}); setTimeout(()=>$("sat").focus({preventScroll:true}),400); });
-if("IntersectionObserver" in window){ new IntersectionObserver(es=>es.forEach(e=>fab.classList.toggle("show",!e.isIntersecting && !document.getElementById("view-match").hidden))).observe(panel); }
+// ---------- Phone: profile as a slide-up sheet ----------
+const panel=$("panel"), sheetScrim=$("sheetScrim");
+const isPhone=()=>matchMedia("(max-width:860px)").matches;
+function syncInert(){ try{ panel.inert = isPhone() && !panel.classList.contains("open"); }catch(_){} }
+function openProfile(focusId){
+  if(isPhone()){
+    panel.classList.add("open"); sheetScrim.hidden=false; document.body.classList.add("locked"); syncInert();
+    setTimeout(()=>{ const f=$(focusId||"sheetDone"); if(f) f.focus(); },280);
+  } else { panel.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); if(focusId) setTimeout(()=>$(focusId).focus({preventScroll:true}),350); }
+}
+function closeProfile(){
+  if(!panel.classList.contains("open")) return;
+  panel.classList.remove("open"); sheetScrim.hidden=true; if(drawer.hidden) document.body.classList.remove("locked"); syncInert();
+  const top=$("summary").getBoundingClientRect().top+scrollY-12; window.scrollTo({top}); $("mbarBtn").focus({preventScroll:true});
+}
+$("mbarBtn").addEventListener("click",()=>openProfile());
+$("sheetDone").addEventListener("click",closeProfile);
+sheetScrim.addEventListener("click",closeProfile);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && drawer.hidden && panel.classList.contains("open")) closeProfile(); });
+addEventListener("resize",()=>{ if(!isPhone() && panel.classList.contains("open")){ panel.classList.remove("open"); sheetScrim.hidden=true; document.body.classList.remove("locked"); } syncInert(); });
+syncInert();
+
+// ---------- My List (saved on this device only) ----------
+const byName=new Map(D.map(d=>[d.name,d]));
+let saved=[]; try{ const v=JSON.parse(localStorage.getItem("mm_saved")||"[]"); if(Array.isArray(v)) saved=v.filter(n=>typeof n==="string"&&byName.has(n)).slice(0,50); }catch(_){ saved=[]; }
+const cmpSel=new Set();
+let currentView="match";
+function persist(){ try{ localStorage.setItem("mm_saved",JSON.stringify(saved)); }catch(_){} }
+const HEART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 7.9 3.6 4.5 7 4.5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.4 0 5.6 3.4 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+function setHeart(b){ const on=saved.includes(b.dataset.name); b.setAttribute("aria-pressed",String(on)); b.setAttribute("aria-label",(on?"Remove ":"Save ")+b.dataset.name+(on?" from":" to")+" My List"); b.title=on?"Saved to My List":"Save to My List"; }
+function heartBtn(name){ const b=el("button","heart"); b.type="button"; b.dataset.name=name; b.innerHTML=HEART; setHeart(b); b.addEventListener("click",e=>{ e.stopPropagation(); toggleSave(name); }); return b; }
+function updateCount(){ $("listCount").textContent=saved.length?String(saved.length):""; }
+function toggleSave(name){
+  const i=saved.indexOf(name);
+  if(i>=0){ saved.splice(i,1); cmpSel.delete(name); } else { if(saved.length>=50) return; saved.push(name); track("save",name); }
+  persist(); updateCount(); document.querySelectorAll(".heart").forEach(b=>{ if(b.dataset.name===name) setHeart(b); });
+  if(currentView==="list") renderList();
+}
+function renderList(){
+  const box=$("listView"); box.replaceChildren();
+  const head=el("div","listhead"); head.append(el("h2",null,"My List")); head.append(el("p","note","Saved colleges stay on this device only. Tap a name for details, or pick 2–3 to compare.")); box.append(head);
+  if(!saved.length){
+    const e=el("div","empty"); e.append(el("p",null,"Your list is empty. Tap the heart on any college to save it here.")); const b=el("a","btn","Find colleges"); b.href="#match"; b.addEventListener("click",ev=>{ ev.preventDefault(); go("match"); }); e.append(b); box.append(e); return;
+  }
+  const p=readProfile(); const rows=saved.map(n=>evaluate(byName.get(n),p));
+  const n={Reach:0,Match:0,Safety:0,None:0}; rows.forEach(r=>n[r.label||"None"]++);
+  // Balance
+  const bal=el("div","dsec balance"); bal.append(el("h3",null,"Balance of your list"));
+  const bar=el("div","balbar"); bar.setAttribute("role","img"); bar.setAttribute("aria-label",`${n.Reach} reach, ${n.Match} match, ${n.Safety} safety`);
+  ["Reach","Match","Safety","None"].forEach(k=>{ if(n[k]){ const i=el("i",k); i.style.flex=String(n[k]); bar.append(i); } }); bal.append(bar);
+  const key=el("div","balkey"); ["Reach","Match","Safety"].forEach(k=>{ const s=el("span"); s.append(el("span","dot "+k)); s.append(el("b",null,n[k])); s.append(document.createTextNode(" "+k)); key.append(s); }); bal.append(key);
+  let adv;
+  if(n.None===rows.length) adv="Add your scores or GPA to see the balance of your list.";
+  else if(!n.Safety) adv="Add at least one Safety: a college where your chance is high and the price works for your family.";
+  else if(!n.Match) adv="Add a few Matches, where your estimated chance is roughly 30–70%.";
+  else if(n.Reach>n.Match+n.Safety) adv="Your list leans on Reaches. That’s fine for dream schools, but make sure you’d be happy at your Matches and Safeties too.";
+  else adv="Nice balance. Counselors often suggest something like 2–3 Reaches, 3–4 Matches and 2–3 Safeties.";
+  bal.append(el("div","advice",adv)); box.append(bal);
+  // Groups
+  [["Reach","Reach · worth a shot"],["Match","Match · strong fit"],["Safety","Safety · likely yes"],[null,"Add scores to sort these"]].forEach(([k,title])=>{
+    const g=rows.filter(r=>(r.label||null)===k); if(!g.length) return;
+    const sec=el("div","lgroup"); const h=el("h3"); if(k) h.append(el("span","dot "+k)); h.append(document.createTextNode(title+" ("+g.length+")")); sec.append(h);
+    const ul=el("ul","lrows");
+    g.forEach(r=>{
+      const li=el("li","lrow");
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.id="cmp_"+saved.indexOf(r.d.name); cb.checked=cmpSel.has(r.d.name); cb.disabled=!cb.checked && cmpSel.size>=3; cb.setAttribute("aria-label","Compare "+r.d.name);
+      cb.addEventListener("change",()=>{ if(cb.checked) cmpSel.add(r.d.name); else cmpSel.delete(r.d.name); renderList(); const again=$(cb.id); if(again) again.focus(); });
+      const nm=el("div","nm"); const nb=el("button",null,r.d.name); nb.type="button"; nb.addEventListener("click",()=>openDrawer(r.d,nb)); nm.append(nb, el("small",null,`${r.d.city}, ${r.d.st} · ${r.d.pub?"Public":"Private"}`));
+      const c=el("span","c",r.chance?rangeTxt(r.chance):"–");
+      const pr=el("span","p",r.price==null?"n/a":money(r.price)+"/yr");
+      const rm=el("button","rm","×"); rm.type="button"; rm.setAttribute("aria-label","Remove "+r.d.name); rm.addEventListener("click",()=>toggleSave(r.d.name));
+      li.append(cb,nm,c,pr,rm); ul.append(li);
+    });
+    sec.append(ul); box.append(sec);
+  });
+  // Compare
+  const cb=el("div","cmpbar"); const lab=el("span",null, cmpSel.size<2?`Pick ${cmpSel.size?"1–2 more":"2–3 colleges"} to compare`:`${cmpSel.size} selected`);
+  const go2=el("button",null,"Compare"); go2.type="button"; go2.disabled=cmpSel.size<2;
+  go2.addEventListener("click",()=>{ const out=$("cmpOut"); renderCompare(out,p); out.hidden=false; out.scrollIntoView({behavior:"smooth",block:"start"}); track("compare",[...cmpSel].join(" vs ")); });
+  cb.append(lab,go2); box.append(cb);
+  const out=el("div"); out.id="cmpOut"; out.hidden=true; box.append(out);
+}
+function renderCompare(out,p){
+  out.replaceChildren(); const rs=[...cmpSel].filter(n=>byName.has(n)).map(n=>evaluate(byName.get(n),p));
+  const sec=el("div","dsec"); sec.append(el("h3",null,"Side by side"));
+  const wrap=el("div","cmpwrap"); const tb=el("table","cmp");
+  const thead=el("thead"); const hr=el("tr"); hr.append(el("th")); rs.forEach(r=>hr.append(el("th",null,r.d.name))); thead.append(hr); tb.append(thead);
+  const ROWS=[
+    ["Your chance", r=>r.chance?rangeTxt(r.chance):"n/a", r=>r.chance?r.chance.mid:null, 1],
+    ["Label", r=>r.label||"n/a"],
+    ["Your net price", r=>r.price==null?"n/a":money(r.price)+"/yr", r=>r.price, -1],
+    ["Sticker price", r=>r.d.coa==null?"n/a":money(r.d.coa)+"/yr", r=>r.d.coa, -1],
+    ["Admit rate", r=>r.d.admit==null?"n/a":(r.d.admit*100<1?"<1%":Math.round(r.d.admit*100)+"%")],
+    ["SAT middle 50%", r=>`${r.d.lo}–${r.d.hi}`],
+    ["ACT middle 50%", r=>r.d.actLo&&r.d.actHi?`${r.d.actLo}–${r.d.actHi}`:"n/a"],
+    ["Graduation rate", r=>pct(r.d.grad), r=>r.d.grad, 1],
+    ["Median pay, 10 yrs", r=>money(r.d.earn), r=>r.d.earn, 1],
+    ["Pell recipients", r=>pct(r.d.pell)],
+    ["Undergrads", r=>r.d.size?r.d.size.toLocaleString("en-US"):"n/a"],
+    ["Location", r=>`${r.d.city}, ${r.d.st}`],
+    ["Type", r=>r.d.pub?"Public":"Private"]
+  ];
+  const tbody=el("tbody");
+  ROWS.forEach(([name,show,val,dir])=>{
+    const tr=el("tr"); const th=el("th",null,name); th.scope="row"; tr.append(th);
+    let best=null; if(val){ const vs=rs.map(val).filter(v=>v!=null); if(vs.length>1) best=dir>0?Math.max(...vs):Math.min(...vs); }
+    rs.forEach(r=>{ const td=el("td",null,show(r)); if(best!=null && val(r)===best) td.className="best"; tr.append(td); });
+    tbody.append(tr);
+  });
+  tb.append(tbody); wrap.append(tb); sec.append(wrap);
+  sec.append(el("p","fine","Green marks the best value in rows where higher (or lower, for prices) is clearly better. Chances are estimates, not guarantees."));
+  out.append(sec);
+}
+updateCount();
+
+// ---------- Quick setup (first visit) ----------
+const qs=$("qs");
+const INCOME_OPTS=[[25000,"Under $30k"],[40000,"$30k–48k"],[60000,"$48k–75k"],[90000,"$75k–110k"],[150000,"Over $110k"]];
+let Q=null;
+function qsFlag(set){ try{ if(set) localStorage.setItem("mm_qs_done","1"); else return localStorage.getItem("mm_qs_done")==="1"; }catch(_){ return false; } }
+function openQS(prefill){
+  Q={step:0,test:"sat",sat:"",act:"",gpa:"",inc:null,home:homeSel.value||"",agree:$("agree").checked};
+  if(prefill){ Q.test=test; Q.sat=$("sat").value; Q.act=$("act").value; Q.gpa=$("gpa").value; const iv=Number($("income").value); if($("income").value!=="") Q.inc=iv; }
+  qs.hidden=false; document.body.classList.add("locked"); qsRender(); track("quickstart","quickstart: opened");
+}
+function closeQS(){ qs.hidden=true; if(drawer.hidden && !panel.classList.contains("open")) document.body.classList.remove("locked"); }
+function qsValid(){
+  if(Q.step===0){ if(Q.test==="none") return true; const v=Number(Q.test==="sat"?Q.sat:Q.act); return Q.test==="sat"? (v>=400&&v<=1600) : (v>=1&&v<=36&&Number.isInteger(v)); }
+  if(Q.step===1){ if(Q.gpa==="") return true; const v=Number(Q.gpa); return Number.isFinite(v)&&v>=0&&v<=4; }
+  return Q.agree;
+}
+function qsRender(){
+  qs.replaceChildren(); const c=el("div","qscard");
+  const prog=el("div","qsprog"); for(let i=0;i<3;i++) prog.append(el("i",i<=Q.step?"on":null)); c.append(prog);
+  const titles=["What are your test scores?","What’s your GPA?","Last one: cost"];
+  const subs=["Skip it if you’re applying test-optional.","Unweighted, on a 4.0 scale. A good guess is fine.","Your family’s yearly income before taxes. It only estimates your price after grants and never leaves your device."];
+  const h=el("h2",null,titles[Q.step]); h.id="qsTitle"; c.append(h, el("p","sub",subs[Q.step]));
+  const err=el("p","qerr"); err.setAttribute("role","alert");
+  if(Q.step===0){
+    const o=el("div","qsopts cols"); o.style.gridTemplateColumns="repeat(3,minmax(0,1fr))";
+    [["sat","SAT"],["act","ACT"],["none","No scores"]].forEach(([k,l])=>{ const b=el("button","qopt",l); b.type="button"; b.setAttribute("aria-pressed",String(Q.test===k)); b.addEventListener("click",()=>{ Q.test=k; qsRender(); const f=$("qsNum"); if(f) f.focus(); }); o.append(b); });
+    c.append(o);
+    if(Q.test!=="none"){
+      const i=document.createElement("input"); i.id="qsNum"; i.className="qbig"; i.type="number"; i.inputMode="numeric";
+      if(Q.test==="sat"){ i.min=400; i.max=1600; i.step=10; i.placeholder="e.g. 1250"; i.value=Q.sat; i.setAttribute("aria-label","SAT total score"); }
+      else { i.min=1; i.max=36; i.step=1; i.placeholder="e.g. 27"; i.value=Q.act; i.setAttribute("aria-label","ACT composite score"); }
+      i.addEventListener("input",()=>{ if(Q.test==="sat") Q.sat=i.value; else Q.act=i.value; nx.disabled=!qsValid(); err.textContent=""; });
+      i.addEventListener("keydown",e=>{ if(e.key==="Enter"&&qsValid()) nx.click(); });
+      c.append(i);
+    }
+  } else if(Q.step===1){
+    const i=document.createElement("input"); i.id="qsNum"; i.className="qbig"; i.type="number"; i.inputMode="decimal"; i.min=0; i.max=4; i.step=0.01; i.placeholder="e.g. 3.6"; i.value=Q.gpa; i.setAttribute("aria-label","Unweighted GPA");
+    i.addEventListener("input",()=>{ Q.gpa=i.value; nx.disabled=!qsValid(); });
+    i.addEventListener("keydown",e=>{ if(e.key==="Enter"&&qsValid()) nx.click(); });
+    c.append(i);
+    const nk=el("button","qskip","I don’t know my GPA yet"); nk.type="button"; nk.style.justifySelf="start"; nk.addEventListener("click",()=>{ Q.gpa=""; Q.step=2; qsRender(); }); c.append(nk);
+  } else {
+    const o=el("div","qsopts cols");
+    INCOME_OPTS.forEach(([v,l])=>{ const b=el("button","qopt",l); b.type="button"; b.setAttribute("aria-pressed",String(Q.inc!=null && Q.inc>0 && bracket(Q.inc)===bracket(v))); b.addEventListener("click",()=>{ Q.inc=v; qsRender(); }); o.append(b); });
+    const ns=el("button","qopt",null); ns.type="button"; ns.append(document.createTextNode("Prefer not to say")); ns.append(el("small",null,"Shows average prices")); ns.setAttribute("aria-pressed",String(Q.inc===-1)); ns.addEventListener("click",()=>{ Q.inc=-1; qsRender(); }); o.append(ns);
+    c.append(o);
+    const sl=el("label"); sl.htmlFor="qsHome"; sl.append(document.createTextNode("Home state"));
+    const sel=homeSel.cloneNode(true); sel.id="qsHome"; sel.value=Q.home; sel.addEventListener("input",()=>{ Q.home=sel.value; }); sl.append(sel); c.append(sl);
+    const ag=el("label","qsagree"); ag.htmlFor="qsAgree"; const ai=document.createElement("input"); ai.type="checkbox"; ai.id="qsAgree"; ai.checked=Q.agree;
+    ai.addEventListener("change",()=>{ Q.agree=ai.checked; nx.disabled=!qsValid(); });
+    const at=el("span"); at.append(document.createTextNode("I understand chances and prices are estimates, not guarantees, and I agree to the "));
+    const tl=el("a",null,"Terms"); tl.href="#terms"; tl.target="_blank"; const pl=el("a",null,"Privacy Policy"); pl.href="#privacy"; pl.target="_blank";
+    [tl,pl].forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); closeQS(); go(a===tl?"terms":"privacy"); }));
+    at.append(tl, document.createTextNode(" and "), pl, document.createTextNode(".")); ag.append(ai,at); c.append(ag);
+  }
+  c.append(err);
+  const nav=el("div","qsnav"); const left=el("div");
+  if(Q.step>0){ const bk=el("button","qback","Back"); bk.type="button"; bk.addEventListener("click",()=>{ Q.step--; qsRender(); }); left.append(bk); }
+  else { const sk=el("button","qskip","Skip, show me an example"); sk.type="button"; sk.addEventListener("click",()=>{ qsFlag(true); $("agree").checked=$("agree").checked; closeQS(); track("quickstart","quickstart: skipped"); }); left.append(sk); }
+  const nx=el("button","qnext",Q.step<2?"Next":"See my colleges"); nx.type="button"; nx.disabled=!qsValid();
+  nx.addEventListener("click",()=>{ if(!qsValid()) return; if(Q.step<2){ Q.step++; qsRender(); } else finishQS(); });
+  nav.append(left,nx); c.append(nav); qs.append(c);
+  const f=$("qsNum")||c.querySelector(".qopt[aria-pressed=true]")||c.querySelector(".qopt")||nx; setTimeout(()=>f.focus(),30);
+}
+function finishQS(){
+  const tb=document.querySelector(`[data-test="${Q.test}"]`); if(tb) tb.click();
+  $("sat").value = Q.test==="sat"?Q.sat:""; $("act").value = Q.test==="act"?Q.act:"";
+  $("gpa").value = Q.gpa;
+  $("income").value = (Q.inc==null||Q.inc<0)?"":String(Q.inc);
+  homeSel.value = Q.home || "";
+  if(acts.length && !$("exampleNote").hidden){ acts=[]; renderActs(); }
+  $("agree").checked=true; $("exampleNote").hidden=true; shown=25;
+  qsFlag(true); closeQS(); run(); track("quickstart","quickstart: finished");
+  go("match"); window.scrollTo({top:$("summary").getBoundingClientRect().top+scrollY-12});
+}
+qs.addEventListener("keydown",e=>{ if(e.key==="Escape"){ qsFlag(true); closeQS(); } });
+$("qsOpen").addEventListener("click",()=>{ closeProfile(); openQS(true); });
+
 // Simple view router using bare hash anchors
-const VIEWS=["match","how","terms","privacy"];
+const VIEWS=["match","list","how","terms","privacy"];
+function go(v){ try{history.replaceState(null,"","#"+v);}catch(_){} route(); }
 function route(){
   const h=(location.hash||"#match").slice(1); const v=VIEWS.includes(h)?h:"match";
   document.querySelectorAll("[data-panel]").forEach(s=>s.hidden = s.dataset.panel!==v);
   document.querySelectorAll("nav.tabs a").forEach(a=>{ if(a.dataset.view===v) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
-  if(v!=="match"){ window.scrollTo(0,0); closeDrawer(); track("tab","tab: "+v); }
+  currentView=v; document.getElementById("mbar").hidden = v!=="match";
+  if(v==="list") renderList();
+  if(v!=="match"){ window.scrollTo(0,0); closeDrawer(); closeProfile(); track("tab","tab: "+v); }
 }
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{ const h=a.getAttribute("href"); e.preventDefault(); try{history.replaceState(null,"",h);}catch(_){} route(); }));
 window.addEventListener("hashchange",route);
 route(); run();
+if(!qsFlag()) openQS(false);
 })();
 </script>
 

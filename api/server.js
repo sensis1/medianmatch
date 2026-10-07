@@ -56,7 +56,7 @@ async function prune() {
 }
 
 // ---------- helpers ----------
-const EVENT_TYPES = new Set(["visit", "open_college", "link_click", "group", "sort", "search", "tab", "chance_view"]);
+const EVENT_TYPES = new Set(["visit", "open_college", "link_click", "group", "sort", "search", "tab", "chance_view", "save", "compare", "quickstart"]);
 
 // Daily-rotating secret salt: visitor IDs can't be linked across days or reversed to an IP.
 let salt = { day: "", value: "" };
@@ -168,7 +168,7 @@ async function handleStats(req, res) {
   const since = `now() - interval '${days} days'`; // days is from a fixed allowlist above
 
   const q = (sql, p = []) => pool.query(sql, p).then(r => r.rows);
-  const [totals, byDay, colleges, links, searches, groups, devices, referrers] = await Promise.all([
+  const [totals, byDay, colleges, links, searches, groups, devices, referrers, saves, extras] = await Promise.all([
     q(`SELECT
          count(*) FILTER (WHERE type='visit')::int AS visits,
          count(DISTINCT (visitor, date_trunc('day', ts))) FILTER (WHERE type='visit')::int AS visitors,
@@ -188,8 +188,10 @@ async function handleStats(req, res) {
     q(`SELECT label, count(*)::int AS n FROM events WHERE type IN ('group','sort','tab') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
     q(`SELECT device AS label, count(*)::int AS n FROM events WHERE type='visit' AND ts >= ${since} GROUP BY device ORDER BY n DESC`),
     q(`SELECT coalesce(label,'direct') AS label, count(*)::int AS n FROM events WHERE type='visit' AND ts >= ${since} GROUP BY 1 ORDER BY n DESC LIMIT 10`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE type='save' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE type IN ('quickstart','compare') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
   ]);
-  send(res, 200, { days, totals: totals[0], byDay, colleges, links, searches, groups, devices, referrers });
+  send(res, 200, { days, totals: totals[0], byDay, colleges, links, searches, groups, devices, referrers, saves, extras });
 }
 
 const DASHBOARD = fs.readFileSync(path.join(__dirname, "dashboard.html"), "utf8");

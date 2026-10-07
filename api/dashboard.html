@@ -71,6 +71,8 @@ ol.rank .bar i{display:block;height:100%;background:var(--bar);border-radius:3px
     <div class="grid">
       <div class="card"><h2>Most-opened colleges</h2><ol class="rank" id="colleges"></ol></div>
       <div class="card"><h2>Links clicked</h2><ol class="rank" id="links"></ol></div>
+      <div class="card"><h2>Most-saved colleges</h2><ol class="rank" id="saves"></ol></div>
+      <div class="card"><h2>Quick setup &amp; compares</h2><ol class="rank" id="extras"></ol></div>
       <div class="card"><h2>Top searches</h2><ol class="rank" id="searches"></ol></div>
       <div class="card"><h2>Filters, sorts &amp; tabs</h2><ol class="rank" id="groups"></ol></div>
       <div class="card"><h2>Devices</h2><ol class="rank" id="devices"></ol></div>
@@ -140,7 +142,7 @@ async function show(){
   const d = await load();
   tiles(d.totals); chart(d.byDay);
   ranked("colleges", d.colleges); ranked("links", d.links); ranked("searches", d.searches);
-  ranked("groups", d.groups); ranked("devices", d.devices); ranked("referrers", d.referrers);
+  ranked("groups", d.groups); ranked("saves", d.saves || []); ranked("extras", d.extras || []); ranked("devices", d.devices); ranked("referrers", d.referrers);
 }
 $("login").addEventListener("submit", async e => {
   e.preventDefault(); $("err").textContent = ""; pw = $("pw").value;

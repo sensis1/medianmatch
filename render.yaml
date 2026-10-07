@@ -23,7 +23,7 @@ services:
         value: max-age=31536000; includeSubDomains
 
   - type: web
-    name: medianmatch-api
+    name: medianmatch-stats
     runtime: node
     plan: free
     rootDir: api

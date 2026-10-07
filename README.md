@@ -23,7 +23,7 @@ Environment variables:
 | `ADMIN_PASSWORD` | Dashboard password, 12+ characters. Keep it secret. |
 | `ALLOWED_ORIGINS` | Your website address, e.g. `https://medianmatch.onrender.com` (no slash at the end). |
 
-If your API address is not `https://medianmatch-api.onrender.com`, update `API_URL` near the top of the
+If your API address is not `https://medianmatch-stats.onrender.com`, update `API_URL` near the top of the
 script in `public/index.html` **and** the `connect-src` address in the Content-Security-Policy line at the top.
 
 ## Privacy
