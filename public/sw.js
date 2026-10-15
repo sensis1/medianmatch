@@ -1,5 +1,5 @@
 /* MedianMatch offline helper: network first, cached copy when offline. Caches only the site's own files. */
-const CACHE = "mm-v3";
+const CACHE = "mm-v4";
 const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/favicon-32.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {
