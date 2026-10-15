@@ -65,9 +65,10 @@ function dailySalt() {
   if (salt.day !== day) salt = { day, value: crypto.randomBytes(32).toString("hex") };
   return salt.value;
 }
+// Use the LAST X-Forwarded-For entry: it is added by Render's proxy. Earlier entries can be faked by the client.
 function clientIp(req) {
-  const xff = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
-  return xff || req.socket.remoteAddress || "";
+  const parts = String(req.headers["x-forwarded-for"] || "").split(",").map(s => s.trim()).filter(Boolean);
+  return parts.length ? parts[parts.length - 1] : (req.socket.remoteAddress || "");
 }
 function visitorId(req) {
   return crypto.createHash("sha256").update(dailySalt() + "|" + clientIp(req) + "|" + (req.headers["user-agent"] || "")).digest("hex").slice(0, 16);
@@ -123,8 +124,10 @@ function limiter(capacity, refillPerSec) {
     b.tokens -= 1; return true;
   };
 }
-const eventLimit = limiter(60, 1);          // 60 burst, 1/sec sustained per visitor
+const eventLimit = limiter(60, 1);          // 60 burst, 1/sec sustained per IP address
+const dailyLimit = limiter(400, 400 / 86400); // about 400 events per IP per day, so one device can't flood the stats
 const loginLimit = limiter(8, 8 / 900);     // 8 tries per 15 minutes per IP
+const loginGlobal = limiter(30, 30 / 900);  // 30 tries per 15 minutes in total, even across many IPs
 
 function passwordOk(given) {
   if (ADMIN_PASSWORD.length < 12 || typeof given !== "string") return false;
@@ -140,8 +143,8 @@ async function handleEvent(req, res) {
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Vary", "Origin");
   if (deviceOf(req) === "bot") { res.statusCode = 204; return res.end(); }
-  const vid = visitorId(req);
-  if (!eventLimit(vid)) return send(res, 429, { error: "slow down" });
+  const vid = visitorId(req), ip = clientIp(req);
+  if (!eventLimit(ip) || !dailyLimit(ip)) return send(res, 429, { error: "slow down" });
   let data;
   try { data = JSON.parse(await readBody(req, 2048)); } catch (e) { return send(res, e.status || 400, { error: "bad request" }); }
   const list = Array.isArray(data) ? data.slice(0, 10) : [data];
@@ -159,7 +162,7 @@ async function handleEvent(req, res) {
 
 async function handleStats(req, res) {
   const ip = clientIp(req);
-  if (!loginLimit(ip)) return send(res, 429, { error: "Too many attempts. Wait 15 minutes." });
+  if (!loginLimit(ip) || !loginGlobal("all")) return send(res, 429, { error: "Too many attempts. Wait 15 minutes." });
   const auth = String(req.headers.authorization || "");
   if (!auth.startsWith("Bearer ") || !passwordOk(auth.slice(7))) return send(res, 401, { error: "Wrong password." });
   let body = {};
@@ -175,21 +178,21 @@ async function handleStats(req, res) {
          count(*) FILTER (WHERE type='open_college')::int AS college_opens,
          count(*) FILTER (WHERE type='link_click')::int AS link_clicks,
          count(*) FILTER (WHERE type='search')::int AS searches
-       FROM events WHERE ts >= ${since}`),
+       FROM events WHERE NOT (type='visit' AND label='loadtest') AND ts >= ${since}`),
     q(`SELECT to_char(d, 'YYYY-MM-DD') AS day,
               coalesce(count(e.*) FILTER (WHERE e.type='visit'),0)::int AS visits,
               coalesce(count(DISTINCT e.visitor) FILTER (WHERE e.type='visit'),0)::int AS visitors
        FROM generate_series(date_trunc('day', ${since}), date_trunc('day', now()), interval '1 day') d
-       LEFT JOIN events e ON date_trunc('day', e.ts) = d
+       LEFT JOIN events e ON date_trunc('day', e.ts) = d AND NOT (e.type='visit' AND e.label='loadtest')
        GROUP BY d ORDER BY d`),
-    q(`SELECT label, count(*)::int AS n FROM events WHERE type='open_college' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
-    q(`SELECT label, count(*)::int AS n FROM events WHERE type='link_click' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
-    q(`SELECT lower(label) AS label, count(*)::int AS n FROM events WHERE type='search' AND ts >= ${since} AND label IS NOT NULL GROUP BY lower(label) ORDER BY n DESC LIMIT 15`),
-    q(`SELECT label, count(*)::int AS n FROM events WHERE type IN ('group','sort','tab') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
-    q(`SELECT device AS label, count(*)::int AS n FROM events WHERE type='visit' AND ts >= ${since} GROUP BY device ORDER BY n DESC`),
-    q(`SELECT coalesce(label,'direct') AS label, count(*)::int AS n FROM events WHERE type='visit' AND ts >= ${since} GROUP BY 1 ORDER BY n DESC LIMIT 10`),
-    q(`SELECT label, count(*)::int AS n FROM events WHERE type='save' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
-    q(`SELECT label, count(*)::int AS n FROM events WHERE type IN ('quickstart','compare') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='open_college' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='link_click' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT lower(label) AS label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='search' AND ts >= ${since} AND label IS NOT NULL GROUP BY lower(label) ORDER BY n DESC LIMIT 15`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type IN ('group','sort','tab') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT device AS label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='visit' AND ts >= ${since} GROUP BY device ORDER BY n DESC`),
+    q(`SELECT coalesce(label,'direct') AS label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='visit' AND ts >= ${since} GROUP BY 1 ORDER BY n DESC LIMIT 10`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type='save' AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
+    q(`SELECT label, count(*)::int AS n FROM events WHERE NOT (type='visit' AND label='loadtest') AND type IN ('quickstart','compare') AND ts >= ${since} AND label IS NOT NULL GROUP BY label ORDER BY n DESC LIMIT 15`),
   ]);
   send(res, 200, { days, totals: totals[0], byDay, colleges, links, searches, groups, devices, referrers, saves, extras });
 }

@@ -1,0 +1,16 @@
+{
+  "name": "MedianMatch",
+  "short_name": "MedianMatch",
+  "description": "Your estimated chances and your family's real price at 900+ U.S. colleges. Free, private, no account.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbfbfa",
+  "theme_color": "#1d5fd1",
+  "lang": "en",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
