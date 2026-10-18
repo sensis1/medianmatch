@@ -6,8 +6,8 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://medianmatch-stats.onrender.com; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
 <meta name="description" content="See your estimated chance at 900+ U.S. colleges, what each would cost your family after grants, and which are strong for your major. Free, private, no account.">
 <link rel="canonical" href="https://medianmatch.onrender.com/">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -31,7 +31,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: slim sticky header; one calm column. Profile strip -> search/filters -> Reach/Match/Safety tabs -> two-up result cards.
    Profile, filters and college details open in one sheet component (side panel on desktop, bottom sheet on phones). */
@@ -86,7 +86,7 @@ nav.tabs .count:empty{display:none}
 .strip{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .strip .who{font-size:13px;font-weight:600;color:var(--faint);margin-right:4px}
 .pchip{border:1px solid var(--line);background:var(--raise);border-radius:6px;padding:6px 11px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
-.pchip.empty,.pchip.blank{background:transparent;border-style:dashed;color:var(--muted);font-weight:500}
+.pchip.empty{background:transparent;border-style:dashed;color:var(--muted);font-weight:500}
 .pchip:hover{border-color:var(--accent)}
 .strip .edit{margin-left:auto;border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;padding:6px 4px}
 .example{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:2px 7px;border-radius:4px}
@@ -378,21 +378,184 @@ footer.foot a{color:var(--muted)}
 @media (max-width:560px){.lrow{grid-template-columns:auto minmax(0,1fr) auto auto}.lrow .p{grid-column:2/3;grid-row:2;margin-top:-6px}.lrow .track{grid-column:2/-1}}
 .grp > h3.gh{margin:0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-family:var(--f-body)}
 [data-lang][hidden]{display:none!important}
-/* First-run polish */
-.qbig{width:100%;-moz-appearance:textfield;appearance:textfield}
-.qbig::-webkit-inner-spin-button,.qbig::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.qbig::placeholder{color:var(--faint);opacity:.45}
-.qshello{margin:0;padding:12px 14px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink);font-size:14.5px}
-.qshello b{font-weight:700}
-.usemine{border:0;border-radius:6px;padding:6px 12px;background:var(--accent);color:var(--accent-ink);font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
-.empty .btn{margin:2px 4px}
-@media (max-width:600px){
-  .segtabs{width:100%}
-  .segtabs button{flex:1;padding:8px 4px 10px}
-  .segtabs button span{margin-left:3px}
-  .sortwrap{padding-top:6px}
-}
 body:has(#view-list:not([hidden]) .cmpbar) .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}
+
+/* ---- Theme: monochrome canvas, uppercase tracked display, mono labels, square surfaces, pill buttons.
+   Signature: a thin Reach / Match / Safety tricolor rule under the header and above the footer. ---- */
+:root{
+  --bg:#fafafa; --surface:#ffffff; --raise:#f1f1f1; --ink:#0f0f10; --muted:#575757; --faint:#6a6a6a; --line:#e2e2e2;
+  --accent:#1f4fa0; --accent-ink:#ffffff; --accent-soft:#eef2f9; --band:#cfd9ea;
+  --reach:#a14d17; --match:#1f4fa0; --safety:#1c7553; --warn:#7d5300; --warn-soft:#f7f0de;
+  --heart:#c2265a; --you:#0f0f10; --input:#ffffff; --scrim:rgba(15,15,16,.38);
+  --f-display:"Geist", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Geist", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r:0px; --ease:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a0a0a; --surface:#111111; --raise:#181818; --ink:#f4f4f4; --muted:#a8a8a8; --faint:#878787; --line:#262626;
+  --accent:#a9c4ee; --accent-ink:#0a0a0a; --accent-soft:#141a24; --band:#2c3a52;
+  --reach:#e49c66; --match:#a9c4ee; --safety:#6dc4a0; --warn:#e3bd62; --warn-soft:#211b0d;
+  --heart:#ee7a9c; --you:#ffffff; --input:#111111; --scrim:rgba(0,0,0,.66)}}
+:root[data-theme="dark"]{
+  --bg:#0a0a0a; --surface:#111111; --raise:#181818; --ink:#f4f4f4; --muted:#a8a8a8; --faint:#878787; --line:#262626;
+  --accent:#a9c4ee; --accent-ink:#0a0a0a; --accent-soft:#141a24; --band:#2c3a52;
+  --reach:#e49c66; --match:#a9c4ee; --safety:#6dc4a0; --warn:#e3bd62; --warn-soft:#211b0d;
+  --heart:#ee7a9c; --you:#ffffff; --input:#111111; --scrim:rgba(0,0,0,.66)}
+
+body{font-weight:400;font-size:15px;letter-spacing:-.003em}
+.wrap,.top .in,footer.foot{max-width:1200px}
+
+/* Mono label voice: nav, buttons, small section heads, captions */
+nav.tabs a,.themebtn,.btn,.fbtn,.chipbtn,.pchip,.segtabs button,.sortwrap,.strip .who,.strip .edit,.example,
+.dsec > h3,.grp > h4,.grp > h3.gh,.lgroup h2,.upcoming h3,.scale,.qscard .kick,.qnext,.tnext,.tour .skipbar button,
+.cmpbar button,.qlink,.st,.mtag,.save-tag,.rk,.cap,.skip{
+  font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.12em;font-weight:400}
+nav.tabs a,.themebtn,.segtabs button,.sortwrap,.strip .edit{font-size:12px}
+.dsec > h3,.grp > h4,.grp > h3.gh,.lgroup h2,.upcoming h3,.qscard .kick,.strip .who{font-size:11px;letter-spacing:.16em}
+.cap,.rk,.mtag,.save-tag,.st,.scale{font-size:10.5px}
+.cap b{font-weight:500}
+
+/* Header: wordmark + tricolor rule */
+.top{background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
+.top::after,footer.foot::before{content:"";position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--reach) 0 33.34%,var(--match) 33.34% 66.67%,var(--safety) 66.67%)}
+.top::after{bottom:-1px}
+.top .in{padding-block:14px}
+.brand{font-family:var(--f-display);font-weight:400;font-size:14px;letter-spacing:.34em;text-transform:uppercase}
+.brand span{color:inherit}
+nav.tabs{gap:4px;margin-left:16px}
+nav.tabs a{color:var(--muted);padding:8px 10px;border-radius:0;border-bottom:1px solid transparent}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{background:none;color:var(--ink);border-bottom-color:var(--ink)}
+nav.tabs .count{border-radius:999px;font-family:var(--f-mono);font-weight:400;letter-spacing:0}
+.themebtn{border-radius:999px;padding:7px 14px}
+@media (max-width:600px){.brand{font-size:13px;letter-spacing:.28em}nav.tabs{margin:0 -10px}}
+
+/* Intro */
+.intro{padding-block:72px 32px}
+.intro h1{font-family:var(--f-display);font-weight:300;text-transform:uppercase;letter-spacing:.035em;
+  font-size:clamp(28px,4.2vw,50px);line-height:1.06;max-width:20ch}
+.intro p{font-size:16.5px;line-height:1.6;max-width:56ch;margin-top:18px;font-weight:300}
+@media (max-width:600px){.intro{padding-block:36px 18px}.intro h1{letter-spacing:.02em}}
+
+/* Surfaces: square, hairline, no shadows */
+.strip,.consent,.balance,.upcoming,.lrows,.cmpwrap,.empty,.sharebar,.card{border-radius:0}
+.strip{padding:14px 16px;gap:8px}
+.pchip,.chipbtn{border-radius:999px;font-size:11.5px;padding:8px 14px;background:transparent;color:var(--ink)}
+.pchip.blank{border-style:dashed;color:var(--muted)}
+.pchip:hover,.chipbtn:hover{border-color:var(--ink)}
+.chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.example{background:none;border:1px solid currentColor;border-radius:999px;font-size:10.5px;padding:3px 9px}
+
+/* Inputs: square with a hairline, ink on focus */
+input,select{border-radius:0;padding:11px 12px;transition:border-color .2s var(--ease)}
+input:focus,select:focus{outline:none;border-color:var(--ink)}
+input:focus-visible,select:focus-visible{outline:none;box-shadow:inset 0 -2px 0 var(--ink)}
+.controls{gap:10px;margin-top:16px}
+.sortwrap select{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:400}
+
+/* Buttons: transparent pills with a 1px rule; primary inverts on hover */
+.btn,.fbtn,.qnext,.tnext,.cmpbar button,.tour .skipbar button{border-radius:999px;font-size:11.5px;padding:11px 20px;
+  transition:background-color .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease),transform .15s var(--ease)}
+.btn,.fbtn{background:transparent;border-color:var(--line)}
+.btn:hover,.fbtn:hover{border-color:var(--ink)}
+.btn.primary,.qnext,.tnext{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.primary:hover,.qnext:not(:disabled):hover,.tnext:hover{background:var(--ink);color:var(--bg)}
+.btn.link{font-size:11.5px;padding:8px 2px}
+.btn:active,.fbtn:active,.qnext:active,.tnext:active,.pchip:active,.chipbtn:active,.heart:active{transform:scale(.97)}
+.cmpbar{border-radius:0}
+.cmpbar button{background:var(--bg);color:var(--ink);border:0}
+.fbtn b{border-radius:999px;font-weight:400}
+.heart,.xbtn{border-radius:50%}
+
+/* Category tabs: text only, active gets its color rule */
+.seg{margin-top:36px}
+.segtabs button{padding:10px 12px 12px;color:var(--muted)}
+.segtabs button span{font-weight:400;color:var(--faint)}
+.meta{margin:16px 0 18px;font-weight:300}
+.meta b{font-weight:500}
+
+/* Cards */
+ol.grid{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+ol.grid > li{border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+ol.grid > li.empty{border-style:solid}
+.card{padding:24px 24px 20px;gap:16px;transition:background-color .25s var(--ease)}
+.card:hover{background:var(--raise);border-color:transparent}
+.c-name h3{font-family:var(--f-display);font-weight:500;font-size:18px;letter-spacing:-.012em;line-height:1.25}
+.c-sub{font-weight:300}
+.big{font-weight:300;font-size:34px;letter-spacing:-.03em}
+.c-price .v{font-weight:400;font-size:19px;letter-spacing:-.01em}
+.meter{height:3px;border-radius:0}
+.meter i{border-radius:0}
+.meter .tick{top:-4px;bottom:-4px;width:1px;opacity:.9}
+.c-foot{font-size:12.5px;font-weight:300}
+.c-maj{border-top-color:var(--line);padding-top:12px}
+.mtag{border-radius:999px;padding:1px 8px}
+@media (max-width:600px){.card{padding:20px 18px 16px}.big{font-size:30px}}
+
+/* Results reveal: short staggered rise on the first screen of cards */
+@keyframes mm-rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+ol.grid > li{animation:mm-rise .45s var(--ease) both}
+ol.grid > li:nth-child(2){animation-delay:30ms} ol.grid > li:nth-child(3){animation-delay:60ms}
+ol.grid > li:nth-child(4){animation-delay:90ms} ol.grid > li:nth-child(5){animation-delay:120ms}
+ol.grid > li:nth-child(6){animation-delay:150ms} ol.grid > li:nth-child(n+7){animation-delay:180ms}
+.sheet{animation:mm-slide .35s var(--ease) both}
+@keyframes mm-slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+@media (max-width:700px){@keyframes mm-slide{from{transform:translateY(32px);opacity:.6}to{transform:none;opacity:1}}}
+
+/* Sheets */
+.sheet .sh h2,.dh h2{font-weight:400;letter-spacing:-.01em}
+.sheet .sh h2{font-size:13px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.16em}
+.dh h2{font-size:26px;font-weight:400}
+.dh{padding:20px 24px}
+.sheet .sb{padding:22px 24px calc(env(safe-area-inset-bottom,0px) + 28px);gap:28px}
+@media (max-width:700px){.sheet,.sheet.wide,.sheet .sh{border-radius:0}.sheet .sh::before{border-radius:0}}
+.hero-chance .big{font-size:56px;letter-spacing:-.04em}
+.hero-chance .lab{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:400}
+.meter.lg{height:4px;border-radius:0}
+.pricebig{font-weight:300;font-size:38px;letter-spacing:-.03em}
+.cb .trk,.cb .trk i,.ec-meter,.balbar,.band .iqr,.qsprog i{border-radius:0}
+.cb .trk{height:4px}
+.cb.you{font-weight:500}
+.fact b{font-weight:400;font-size:18px;letter-spacing:-.01em}
+.fact span{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.12em;font-size:10.5px}
+.tips b{font-family:var(--f-mono);font-weight:400}
+.segbtns,.segbtns button,.qopt,.simlist button,.ec-del,.rm,.track select,.track input{border-radius:0}
+.segbtns button{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;font-weight:400}
+.qopt{font-weight:400}
+label.f{font-weight:500}
+.whylist b{font-weight:500}
+.balbar{height:4px}
+.lrow .nm button{font-weight:500}
+.lrow .c{font-weight:400}
+table.cmp thead th{font-weight:500;font-size:15px}
+table.cmp td.best{font-weight:500}
+
+/* My List, guide, legal */
+.lhead{padding-block:56px 20px}
+.lhead h1,.doc h1{font-weight:300;text-transform:uppercase;letter-spacing:.04em;font-size:clamp(26px,3.4vw,38px)}
+.doc{padding-block:56px 8px}
+.doc h2,.doc h3{font-weight:500;font-size:17px;letter-spacing:-.005em;margin-top:34px}
+.doc details summary{font-weight:400;font-size:17px}
+.doc p,.doc li{font-weight:300;line-height:1.7}
+.about .lead{font-weight:300;font-size:20px;line-height:1.5}
+
+/* Quick setup + tour */
+.qscard{gap:22px}
+.qsprog i{height:2px}
+.qscard h2{font-weight:300;text-transform:uppercase;letter-spacing:.03em;font-size:clamp(24px,4.6vw,34px)}
+.qbig{font-weight:300;font-size:40px;letter-spacing:-.03em}
+.tour .spot{border-radius:0}
+.tour .bubble{border-radius:0}
+.tour h3{font-weight:500;font-size:17px}
+.toast{border-radius:999px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;font-weight:400;padding:11px 20px}
+
+footer.foot{position:relative;margin-top:72px;border-top:0;padding-top:28px;font-weight:300}
+footer.foot::before{top:0}
+
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (max-width:600px){.themebtn{padding:6px 10px;letter-spacing:.08em;font-size:11px}.brand{letter-spacing:.22em}.hdr-actions{gap:4px}}
 </style>
 <script>
 /* Apply saved theme before the page paints (auto = follow the device setting) */
@@ -434,7 +597,6 @@ body:has(#view-list:not([hidden]) .cmpbar) .toast{bottom:calc(env(safe-area-inse
       <button type="button" class="pchip" id="chipActs"></button>
       <button type="button" class="pchip" id="chipMoney"></button>
       <span class="example" id="exampleNote" data-t="Example student">Example student</span>
-      <button type="button" class="usemine" id="useMine" data-t="Use my info">Use my info</button>
       <button type="button" class="edit" id="editProfile" data-t="Edit">Edit</button>
     </div>
 
@@ -763,7 +925,6 @@ body:has(#view-list:not([hidden]) .cmpbar) .toast{bottom:calc(env(safe-area-inse
 
 // ---------- Language (English / Spanish) ----------
 const ES = {"Skip to content":"Saltar al contenido","Discover":"Explorar","My List":"Mi lista","Guide":"Guía","About":"Acerca de","Find colleges that fit you, and what they’d really cost.":"Encuentra universidades a tu medida y lo que de verdad costarían.","Your chances and your family’s price at over 900 U.S. colleges. Free, and nothing you enter leaves your device.":"Tus probabilidades y el precio para tu familia en más de 900 universidades de EE. UU. Gratis, y nada de lo que escribes sale de tu dispositivo.","You":"Tú","Example student":"Estudiante de ejemplo","Edit":"Editar","Search colleges or cities":"Busca universidades o ciudades","Intended major":"Carrera que te interesa","Any major":"Cualquier carrera","Filters":"Filtros","Cheaper than you think":"Más barata de lo que crees","MedianMatch shows estimates for research, not admission decisions or financial advice. To see your chances, agree to the":"MedianMatch muestra estimaciones para investigar, no decisiones de admisión ni asesoría financiera. Para ver tus probabilidades, acepta los","Terms":"Términos","and":"y","Privacy Policy":"Política de privacidad","I agree":"Acepto","All":"Todas","Reach":"Difícil","Match":"Posible","Safety":"Segura","Sort":"Ordenar","Best fit":"Mejor opción","Lowest price for you":"Precio más bajo para ti","Biggest savings vs. sticker":"Mayor ahorro vs. precio oficial","Highest chance":"Mayor probabilidad","Graduation rate":"Tasa de graduación","Pay after 10 years":"Sueldo a los 10 años","Most selective":"Más selectivas","Pay in your major":"Sueldo en tu carrera","Data: U.S. Department of Education, College Scorecard (latest release, downloaded Oct 2026)":"Datos: Departamento de Educación de EE. UU., College Scorecard (última versión, descargada en oct. 2026)","Estimates only, not a guarantee of admission or aid":"Solo estimaciones, sin garantía de admisión ni de ayuda","Privacy":"Privacidad","Source code":"Código fuente","Your profile":"Tu perfil","Done":"Listo","Test scores":"Puntajes de exámenes","Test-optional":"Sin examen","SAT total":"SAT total","ACT composite":"ACT compuesto","Unweighted GPA":"GPA sin ponderar","Activities":"Actividades","Count activities in my chances":"Contar actividades en mis probabilidades","Strength":"Nivel","Add activity":"Agregar actividad","What the levels mean":"Qué significan los niveles","Level 1 · National":"Nivel 1 · Nacional","National awards, published research, a business with real revenue, recruited athlete.":"Premios nacionales, investigación publicada, un negocio con ingresos reales, atleta reclutado.","Level 2 · State":"Nivel 2 · Estatal","State or regional honors, all-state, measurable community impact.":"Reconocimientos estatales o regionales, selección estatal, impacto medible en la comunidad.","Level 3 · Leader":"Nivel 3 · Líder","President, captain, editor, club founder, a job with real responsibility.":"Presidente, capitán, editor, fundador de un club, un trabajo con verdadera responsabilidad.","Level 4 · Involved":"Nivel 4 · Participante","Member, volunteer, team player, steady part-time job.":"Miembro, voluntario, integrante de equipo, trabajo de medio tiempo estable.","Family and home":"Familia y hogar","Household income":"Ingreso del hogar","Per year, before taxes":"Por año, antes de impuestos","Home state":"Estado donde vives","Remember my profile on this device":"Recordar mi perfil en este dispositivo","Quick setup":"Configuración rápida","Show me around":"Muéstrame cómo funciona","Clear everything":"Borrar todo","Show results":"Ver resultados","Colleges":"Universidades","College group":"Grupo de universidades","All colleges":"Todas las universidades","Ivy League":"Ivy League","Top 20 most selective":"Las 20 más selectivas","Top 50 most selective":"Las 50 más selectivas","Don’t use test scores":"No usan puntajes de exámenes","Type":"Tipo","Any":"Cualquiera","Public":"Pública","Private":"Privada","Size":"Tamaño","Under 5,000":"Menos de 5,000","Over 15,000":"Más de 15,000","Location":"Ubicación","Price":"Precio","Most my family can pay per year":"Lo máximo que mi familia puede pagar al año","Leave blank for no limit":"Déjalo vacío para no poner límite","e.g. 20000":"ej. 20000","Major":"Carrera","Top-paying programs only":"Solo programas con mejores sueldos","Clear filters":"Borrar filtros","Text with {n}":"Texto con {n}","Auto":"Automático","Light":"Claro","Dark":"Oscuro","Theme: {x} (click to change)":"Tema: {x} (haz clic para cambiar)","Color theme: {x}":"Tema de color: {x}","Top 10% pay":"Top 10% en sueldo","Top 25% pay":"Top 25% en sueldo","Choose your state":"Elige tu estado","Anywhere in the U.S.":"Cualquier lugar de EE. UU.","My home state":"Mi estado","Activity":"Actividad","Activity {n} name":"Nombre de la actividad {n}","Activity {n} level":"Nivel de la actividad {n}","Remove activity {n}":"Quitar actividad {n}","SAT must be between 400 and 1600.":"El SAT debe estar entre 400 y 1600.","ACT must be between 1 and 36.":"El ACT debe estar entre 1 y 36.","GPA must be between 0 and 4.00.":"El GPA debe estar entre 0 y 4.00.","Income must be a positive number.":"El ingreso debe ser un número positivo.","Raise your ACT about 2 points":"Sube tu ACT unos 2 puntos","Raise your SAT to {n}":"Sube tu SAT a {n}","Raise your GPA to {n}":"Sube tu GPA a {n}","Add a state or regional level activity":"Agrega una actividad de nivel estatal o regional","Earn a national level achievement":"Logra un reconocimiento de nivel nacional","Starting point":"Punto de partida","No admit rate reported, so 50% is used.":"No se reporta tasa de admisión, así que se usa 50%.","{x} of all applicants get in.":"Entra el {x} de todos los solicitantes.","This college doesn’t use or report SAT/ACT scores, so they aren’t counted.":"Esta universidad no usa ni reporta puntajes SAT/ACT, así que no se cuentan.","Your SAT {you}":"Tu SAT {you}","Above the middle 50% here ({lo}–{hi}).":"Por encima del 50% central aquí ({lo}–{hi}).","Below the middle 50% here ({lo}–{hi}).":"Por debajo del 50% central aquí ({lo}–{hi}).","Inside the middle 50% here ({lo}–{hi}).":"Dentro del 50% central aquí ({lo}–{hi}).","You didn’t enter a score, so only GPA is used.":"No escribiste un puntaje, así que solo se usa el GPA.","Your GPA {g}":"Tu GPA {g}","Above the typical {x} here (est.).":"Por encima del típico {x} aquí (est.).","Below the typical {x} here (est.).":"Por debajo del típico {x} aquí (est.).","Close to the typical {x} here (est.).":"Cerca del típico {x} aquí (est.).","Your activities":"Tus actividades","{x} for this college. They count for about {w}% of the estimate here.":"{x} para esta universidad. Cuentan aproximadamente un {w}% de la estimación aquí.","Very selective":"Muy selectiva","Strong numbers help less here, because most applicants have them too.":"Los buenos números ayudan menos aquí, porque la mayoría de los solicitantes también los tiene.","Estimated chance {c}; admit rate for all applicants {a}":"Probabilidad estimada {c}; tasa de admisión general {a}","{n} students":"{n} estudiantes","size n/a":"tamaño n/d","your chance":"tu probabilidad","Add scores or GPA for a chance":"Agrega puntajes o GPA para ver tu probabilidad","est.":"est.","your price / yr":"tu precio / año","Admit {x}":"Admite {x}","Graduate {x}":"Se gradúa {x}","{x}% off sticker":"{x}% menos que el precio oficial","#{n} most selective":"#{n} más selectiva","No test scores used":"No usa puntajes de exámenes","${p}k pay {y} after":"${p}k de sueldo {y} después","{n} grads/yr":"{n} graduados/año","Add test score":"Agregar puntaje","Add GPA":"Agregar GPA","Activities off":"Actividades desactivadas","Add activities":"Agregar actividades","Add income":"Agregar ingreso","{n} colleges award bachelor’s degrees in {m}.":"{n} universidades otorgan licenciaturas en {m}.","Agree above to see your chances and prices.":"Acepta arriba para ver tus probabilidades y precios.","{n} colleges":"{n} universidades","typical price for you":"precio típico para ti","/yr":"/año","each costs you under half its sticker price":"cada una te cuesta menos de la mitad de su precio oficial","No colleges match that search.":"Ninguna universidad coincide con esa búsqueda.","No colleges match these filters.":"Ninguna universidad coincide con estos filtros.","Clear search and filters":"Borrar búsqueda y filtros","Show more ({n} left)":"Ver más (quedan {n})","Close":"Cerrar","Your chance":"Tu probabilidad","Why this number?":"¿Por qué este número?","Add a test score or GPA to see your chance.":"Agrega un puntaje o tu GPA para ver tu probabilidad.","Ways to raise it":"Formas de subirla","+{n} pts":"+{n} pts","Adjust your numbers":"Ajusta tus números","Income":"Ingreso","Cost for your family":"Costo para tu familia","a year":"al año","estimate":"estimación","About {four} over four years if prices hold. Sticker price is {coa} a year{ins}.":"Unos {four} en cuatro años si los precios se mantienen. El precio oficial es {coa} al año{ins}.","in-state":"para residentes","That’s {x}% off the sticker price.":"Eso es {x}% menos que el precio oficial.","Family income {b}: {v}":"Ingreso familiar {b}: {v}","no data":"sin datos","Typical debt at graduation":"Deuda típica al graduarse","Monthly payment":"Pago mensual","/mo":"/mes","Average price after grants by family income, for students with federal aid.":"Precio promedio después de becas según el ingreso familiar, para estudiantes con ayuda federal.","Includes out-of-state tuition.":"Incluye la matrícula para no residentes.","Debt is the median federal loan amount for graduates.":"La deuda es la mediana de préstamos federales de los graduados.","Get your exact price: this college’s Net Price Calculator":"Calcula tu precio exacto: la calculadora de precio neto de esta universidad","Test scores here":"Puntajes aquí","This college doesn’t use or report SAT/ACT scores. Your chance here is based on your GPA, activities and its admit rate.":"Esta universidad no usa ni reporta puntajes SAT/ACT. Tu probabilidad aquí se basa en tu GPA, tus actividades y su tasa de admisión.","Typical GPA (est.)":"GPA típico (est.)","Middle 50% SAT {lo} to {hi}":"50% central SAT de {lo} a {hi}","you {s}":"tú {s}","SAT middle 50%":"SAT 50% central","ACT middle 50%":"ACT 50% central","The vertical line is you.":"La línea vertical eres tú.","Majors":"Carreras","{n}/yr":"{n}/año","No bachelor’s graduates in {m} reported here.":"No se reportan graduados de licenciatura en {m} aquí.","Graduates a year and median pay 4 years after (1 year when 4 isn’t reported). {n} majors in total.":"Graduados por año y sueldo mediano 4 años después (1 año cuando no hay dato de 4). {n} carreras en total.","Major data isn’t available for this college yet.":"Todavía no hay datos de carreras para esta universidad.","Outcomes":"Resultados","Pay after 10 yrs":"Sueldo a los 10 años","Pell grant students":"Estudiantes con beca Pell","Similar colleges":"Universidades similares","College website":"Sitio web de la universidad","Estimates only, not a guarantee of admission or aid.":"Solo estimaciones, sin garantía de admisión ni de ayuda.","My List holds up to 50 colleges":"Mi lista guarda hasta 50 universidades","Saved to My List":"Guardada en Mi lista","Couldn’t copy. Select and copy manually.":"No se pudo copiar. Selecciona y copia a mano.","no label":"sin etiqueta","chance":"probabilidad","about":"aprox.","deadline":"fecha límite","My college list from MedianMatch":"Mi lista de universidades de MedianMatch","Estimates only.":"Solo estimaciones.","List copied":"Lista copiada","Saved on this device. Track your applications, or pick 2 or 3 to compare.":"Guardada en este dispositivo. Sigue tus solicitudes o elige 2 o 3 para comparar.","Tap the heart on any college to save it here.":"Toca el corazón en cualquier universidad para guardarla aquí.","Copy list":"Copiar lista","Share link":"Compartir enlace","Link copied. Anyone with it sees your colleges, not your scores.":"Enlace copiado. Quien lo tenga verá tus universidades, no tus puntajes.","Nothing saved yet.":"Todavía no has guardado nada.","Discover colleges":"Explorar universidades","{r} reach, {m} match, {s} safety":"{r} difíciles, {m} posibles, {s} seguras","Add your scores or GPA to see the balance of your list.":"Agrega tus puntajes o GPA para ver el balance de tu lista.","Add at least one Safety: a college where your chance is high and the price works.":"Agrega al menos una Segura: una universidad donde tu probabilidad es alta y el precio te funciona.","Add a few Matches, where your chance is roughly 30–70%.":"Agrega algunas Posibles, donde tu probabilidad es de un 30–70%.","Lots of Reaches. Make sure you’d be happy at your Matches and Safeties too.":"Muchas Difíciles. Asegúrate de que también estarías feliz en tus Posibles y Seguras.","Good balance. Counselors often suggest 2–3 Reaches, 3–4 Matches and 2–3 Safeties.":"Buen balance. Los consejeros suelen sugerir 2–3 Difíciles, 3–4 Posibles y 2–3 Seguras.","Upcoming deadlines":"Próximas fechas límite","today":"hoy","tomorrow":"mañana","in {n} days":"en {n} días","Compare {n}":"Comparar {n}","Application status for {n}":"Estado de la solicitud para {n}","Application deadline for {n}":"Fecha límite de solicitud para {n}","Remove {n}":"Quitar {n}","Pick 1 or 2 more to compare":"Elige 1 o 2 más para comparar","Pick 2 or 3 to compare":"Elige 2 o 3 para comparar","{n} selected":"{n} seleccionadas","Compare":"Comparar","Side-by-side comparison":"Comparación lado a lado","Measure":"Dato","Label":"Etiqueta","Your price":"Tu precio","Four years":"Cuatro años","Typical debt":"Deuda típica","{m} grads/yr":"Graduados de {m}/año","not offered":"no se ofrece","{m} pay":"Sueldo en {m}","Admit rate":"Tasa de admisión","Not used":"No se usa","Students":"Estudiantes","best":"mejor","Green marks the better value where higher (or lower, for prices and debt) is clearly better.":"El verde marca el mejor valor cuando más alto (o más bajo, en precios y deuda) es claramente mejor.","A shared college list":"Una lista de universidades compartida","Someone shared these colleges with you. Chances and prices below are based on your own profile on this device.":"Alguien compartió estas universidades contigo. Las probabilidades y precios se basan en tu propio perfil en este dispositivo.","This link doesn’t contain any colleges.":"Este enlace no contiene universidades.","Add these {n} colleges to your own list?":"¿Agregar estas {n} universidades a tu lista?","Save to My List":"Guardar en Mi lista","Added {n} colleges":"Se agregaron {n} universidades","Profile saved on this device":"Perfil guardado en este dispositivo","Profile no longer saved":"El perfil ya no se guarda","Cleared":"Borrado","Step {n} of 3":"Paso {n} de 3","SAT total score":"Puntaje total del SAT","ACT composite score":"Puntaje compuesto del ACT","Prefer not to say":"Prefiero no decir","Shows average prices":"Muestra precios promedio","I understand chances and prices are estimates, not guarantees, and I agree to the":"Entiendo que las probabilidades y los precios son estimaciones, no garantías, y acepto los","Back":"Atrás","Skip and look around":"Saltar y explorar","Don’t know yet":"Todavía no sé","Next":"Siguiente","See my colleges":"Ver mis universidades","Book Buddy tour":"Recorrido con Book Buddy","Skip tour":"Saltar recorrido","Got it":"Entendido","n/a":"n/d","Northeast":"Noreste","Midwest":"Medio Oeste","South":"Sur","West":"Oeste","L1 · National":"N1 · Nacional","L2 · State":"N2 · Estatal","L3 · Leader":"N3 · Líder","L4 · Involved":"N4 · Participante","Regional science fair award":"Premio regional de feria de ciencias","Varsity soccer captain":"Capitana del equipo de fútbol","Founded coding club":"Fundó un club de programación","Part-time job":"Trabajo de medio tiempo","None yet":"Ninguna aún","Standout":"Sobresaliente","Strong":"Fuerte","Solid":"Sólido","Getting started":"Empezando","Above typical":"Por encima de lo típico","Typical":"Típico","Below typical":"Por debajo de lo típico","4 yrs":"4 años","1 yr":"1 año","{n} activity":"{n} actividad","{n} activities":"{n} actividades"," (similar)":" (similar)","Status…":"Estado…","Considering":"Considerando","Applying":"Preparando solicitud","Applied":"Solicitud enviada","Accepted":"Admitido","Waitlisted":"En lista de espera","Not admitted":"No admitido","Committed":"Inscrito","Remove {n} from My List":"Quitar {n} de Mi lista","Save {n} to My List":"Guardar {n} en Mi lista","Saved":"Guardada","None":"Ninguna","Needs your scores":"Faltan tus puntajes"," vs ":" vs ","Under $30k":"Menos de $30k","Over $110k":"Más de $110k","What are your test scores?":"¿Cuáles son tus puntajes?","What’s your GPA?":"¿Cuál es tu GPA?","Last one: your family’s income":"Por último: el ingreso de tu familia","Skip it if you’re applying test-optional.":"Sáltalo si vas a aplicar sin examen.","Unweighted, out of 4.0. A good guess is fine.":"Sin ponderar, sobre 4.0. Un cálculo aproximado está bien.","Used only to estimate your price after grants. It stays on your device.":"Solo se usa para estimar tu precio después de becas. Se queda en tu dispositivo.","No scores":"Sin puntajes","Add your activities":"Agrega tus actividades","Clubs, jobs, sports, a business you started. Tap here, then give each one a level. Strong activities can raise your chances, especially at selective schools.":"Clubes, trabajos, deportes, un negocio que empezaste. Toca aquí y dale un nivel a cada una. Las actividades fuertes pueden subir tus probabilidades, sobre todo en universidades selectivas.","Pick a major":"Elige una carrera","See which colleges graduate students in it and what they earn. In Filters you can show only the top-paying programs.":"Mira qué universidades gradúan estudiantes en ella y cuánto ganan. En Filtros puedes mostrar solo los programas con mejores sueldos.","Computer Science":"Ciencias de la computación","Data Science & Analytics":"Ciencia de datos y analítica","Engineering (all)":"Ingeniería (todas)","Mechanical Engineering":"Ingeniería mecánica","Electrical & Computer Engineering":"Ingeniería eléctrica y de computadoras","Civil Engineering":"Ingeniería civil","Biomedical Engineering":"Ingeniería biomédica","Chemical Engineering":"Ingeniería química","Aerospace Engineering":"Ingeniería aeroespacial","Business (all)":"Negocios (todas)","Finance":"Finanzas","Accounting":"Contabilidad","Marketing":"Mercadotecnia","Management":"Administración","Entrepreneurship":"Emprendimiento","Economics":"Economía","Biology":"Biología","Nursing":"Enfermería","Health Sciences & Public Health":"Ciencias de la salud y salud pública","Psychology":"Psicología","Political Science":"Ciencias políticas","International Relations":"Relaciones internacionales","Math & Statistics":"Matemáticas y estadística","Physics":"Física","Chemistry":"Química","Environmental Science":"Ciencias ambientales","Communications & Journalism":"Comunicación y periodismo","English":"Inglés","History":"Historia","Education":"Educación","Art, Design & Music":"Arte, diseño y música","Architecture":"Arquitectura","Criminal Justice":"Justicia penal","Kinesiology & Exercise Science":"Kinesiología y ciencias del ejercicio","Philosophy & Religion":"Filosofía y religión","Sociology & Anthropology":"Sociología y antropología","Foreign Languages":"Idiomas extranjeros","Agriculture":"Agricultura","This college doesn’t report prices by family income, often because it doesn’t take federal aid.":"Esta universidad no reporta precios según el ingreso familiar, a menudo porque no acepta ayuda federal.","Its sticker price is {coa} a year.":"Su precio oficial es {coa} al año.","Its own Net Price Calculator or aid office can give you a real number.":"Su calculadora de precio neto o su oficina de ayuda financiera te pueden dar un número real."};
-Object.assign(ES,{"Use my info":"Usar mis datos","Tap “I agree” above to see your chances and prices. Want them for you instead of the example student?":"Toca “Acepto” arriba para ver tus probabilidades y precios. ¿Los quieres para ti en vez del estudiante de ejemplo?","Answer 3 quick questions":"Responde 3 preguntas rápidas","Hi! Let’s find your colleges.":"¡Hola! Busquemos tus universidades.","3 quick questions, about 30 seconds. A rough guess is fine, and you can change anything later.":"3 preguntas rápidas, unos 30 segundos. Un cálculo aproximado está bien y puedes cambiar todo después."});
 const store = { get(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(_){} }, del(k){ try{ localStorage.removeItem(k); }catch(_){} } };
 let LANG = store.get("mm_lang") || ((navigator.language||"").toLowerCase().startsWith("es") ? "es" : "en");
 if (LANG!=="es") LANG="en";
@@ -1090,7 +1251,7 @@ function updateStrip(p){
   if(!$("ecOn").checked) set(ac,t("Activities off"),true); else if(acts.length) set(ac,t(acts.length===1?"{n} activity":"{n} activities",{n:acts.length})+" · "+ecWord(p.ec)); else set(ac,t("Add activities"),true);
   const parts=[]; if(p.inc!=null) parts.push(BRACKET_LABEL[bracket(p.inc)]); if(p.home) parts.push(p.home);
   if(parts.length) set(mo,parts.join(" · ")); else set(mo,t("Add income"),true);
-  $("exampleNote").hidden=!isExample; $("useMine").hidden=!isExample;
+  $("exampleNote").hidden=!isExample;
 }
 function run(){
   const agreed=$("agree").checked;
@@ -1113,9 +1274,7 @@ function run(){
   const prices=rows.map(r=>r.price).filter(v=>v!=null).sort((a,b)=>a-b);
   const median=prices.length?prices[Math.floor(prices.length/2)]:null;
   const meta=$("meta"); meta.replaceChildren();
-  if(!agreed){ $("moreBtn").hidden=true; const e=el("li","empty"); e.style.gridColumn="1/-1"; e.append(el("p",null,t("Tap “I agree” above to see your chances and prices. Want them for you instead of the example student?")));
-    const qb=el("button","btn",t("Answer 3 quick questions")); qb.type="button"; qb.addEventListener("click",()=>openQS(false));
-    e.append(qb); list.append(e); return; }
+  if(!agreed){ $("moreBtn").hidden=true; const e=el("li","empty"); e.style.gridColumn="1/-1"; e.append(el("p",null,t("Agree above to see your chances and prices."))); list.append(e); return; }
   if(cat!=="all") rows=rows.filter(r=>r.label===cat);
   const key={
     fit:r=>r.s==null?0:Math.abs(r.s-0.15),
@@ -1226,7 +1385,7 @@ function renderDrawer(){
 
   // Cost
   const cost=sec(t("Cost for your family"));
-  const pb=el("div","pricebig"); pb.append(document.createTextNode(r.price==null?"n/a":money(r.price))); pb.append(el("small",null," "+t("a year")+(r.estOut?" ("+t("estimate")+")":"")));
+  const pb=el("div","pricebig"); pb.append(document.createTextNode(r.price==null?"n/a":money(r.price))); if(r.price!=null) pb.append(el("small",null," "+t("a year")+(r.estOut?" ("+t("estimate")+")":"")));
   cost.append(pb);
   if(r.price!=null) cost.append(el("p","para",t("About {four} over four years if prices hold. Sticker price is {coa} a year{ins}.",{four:money(r.price*4),coa:money(d.coa),ins:d.pub?" "+t("in-state"):""})+(r.save!=null&&r.save>=0.5?" "+t("That’s {x}% off the sticker price.",{x:Math.round(r.save*100)}):"")));
   const yours=p.inc!=null?bracket(p.inc):-1;
@@ -1239,7 +1398,7 @@ function renderDrawer(){
   if(vals.every(v=>v==null)){ cost.append(el("p","notest",t("This college doesn’t report prices by family income, often because it doesn’t take federal aid.")+(d.coa!=null?" "+t("Its sticker price is {coa} a year.",{coa:money(d.coa)}):"")+" "+t("Its own Net Price Calculator or aid office can give you a real number."))); }
   else cost.append(bars);
   if(d.debt!=null){ const db=el("div","debt"); db.append(fact(t("Typical debt at graduation"),money(d.debt)), fact(t("Monthly payment"),d.monthly!=null?"$"+Math.round(d.monthly)+t("/mo"):"n/a")); cost.append(db); }
-  cost.append(el("p","fine",t("Average price after grants by family income, for students with federal aid.")+(r.estOut?" "+t("Includes out-of-state tuition."):"")+(d.debt!=null?" "+t("Debt is the median federal loan amount for graduates."):"")));
+  if(vals.some(v=>v!=null)) cost.append(el("p","fine",t("Average price after grants by family income, for students with federal aid.")+(r.estOut?" "+t("Includes out-of-state tuition."):"")+(d.debt!=null?" "+t("Debt is the median federal loan amount for graduates."):"")));
   if(d.npc) { const a=linkA(t("Get your exact price: this college’s Net Price Calculator"),d.npc); cost.append(a); }
   body.append(cost);
 
@@ -1474,7 +1633,6 @@ $("reset").addEventListener("click",()=>{
   $("remember").checked=false; store.del("mm_profile"); shown=24; run(); toast(t("Cleared"));
 });
 $("editProfile").addEventListener("click",()=>openProfile(null));
-$("useMine").addEventListener("click",()=>{ openQS(false); track("quickstart","use my info"); });
 $("chipScore").addEventListener("click",()=>openProfile(test==="act"?"act":test==="sat"?"sat":null));
 $("chipGpa").addEventListener("click",()=>openProfile("gpa"));
 $("chipActs").addEventListener("click",()=>openProfile(acts.length?"ecName0":"ecAdd"));
@@ -1511,7 +1669,6 @@ function qsRender(){
   const prog=el("div","qsprog"); for(let i=0;i<3;i++) prog.append(el("i",i<=Q.step?"on":null)); c.append(prog, top);
   const titles=["What are your test scores?","What’s your GPA?","Last one: your family’s income"];
   const subs=["Skip it if you’re applying test-optional.","Unweighted, out of 4.0. A good guess is fine.","Used only to estimate your price after grants. It stays on your device."];
-  if(Q.step===0){ const hi=el("p","qshello"); hi.append(el("b",null,t("Hi! Let’s find your colleges.")), document.createTextNode(" "+t("3 quick questions, about 30 seconds. A rough guess is fine, and you can change anything later."))); c.append(hi); }
   const h=el("h2",null,t(titles[Q.step])); h.id="qsTitle"; c.append(h, el("p","sub",t(subs[Q.step])));
   let nx;
   if(Q.step===0){

@@ -3,6 +3,15 @@
 Match your SAT/ACT, GPA, activities and family income with 930+ U.S. colleges (including test-free UC and CSU campuses), see an estimated
 admission chance (as a range) and what each college would cost your family after grants.
 
+What students can do:
+
+- **Discover**: Reach / Match / Safety colleges with a short "why it fits" on each card, plus QuestBridge partner tags and a filter.
+- **What if?**: move SAT/ACT, GPA, test-optional, activities or major and watch the whole list shift before changing the profile.
+- **My List**: per-college status, round, deadline and checklist; essay and financial-aid steps (FAFSA, CSS Profile, QuestBridge); "Next up" reminders; compare 2–4 colleges.
+- **Report**: strengths, gaps and next steps for academics, activities, essays, financial aid and list balance (no overall score).
+
+The QuestBridge partner list is hard-coded in `index.html` (`const QB`) from questbridge.org/partners/college-partners (checked October 2026). Check it each fall.
+
 ## Folders
 
 | Folder | What it is |
